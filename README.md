@@ -14,6 +14,7 @@ I used SQL Server to save the data i had read from the gateway.
   Entity Framework 
    
  #References  
- HSL Communication : https://github.com/dathlin/HslCommunication
+ HSL Communication : https://github.com/dathlin/HslCommunication  
+ 
  HSL MQTT API: http://api.hslcommunication.cn/html/68b3b27c-e8db-3b64-4a05-22be97dc0b2b.htm
  
