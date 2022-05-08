@@ -1,5 +1,5 @@
 # This project is not completely and  on going Update. 
-#Sumary 
+#Summary 
 
 In this project, I try to connect Iot gateway using MQTT Protocol. 
 I can visualize, control the data from the decives which is connected to the gateway like PLC, sensor, other industrial devices...
