@@ -1,24 +1,19 @@
 # This project on going Update. 
-##Sumary
+#Sumary
 In this project, I 
 
-##Protocol 
+#Protocol 
 
 MQTT 
 
 ##Tech Stack: 
 
  . Net FrameWork 4.5.2 
- 
- WPF 
- 
+ WPF  
  SQL Server 
- 
  HSL Communication 
- 
  Entity Framework 
- 
- ###References 
+ #References 
  
  
  HSL MQTT API: http://api.hslcommunication.cn/html/68b3b27c-e8db-3b64-4a05-22be97dc0b2b.htm
