@@ -1,0 +1,741 @@
+﻿<Window xmlns:HMIControl="clr-namespace:HMIControl;assembly=HMIControl" 
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AS_MQTTClient.Controls"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:WPF="clr-namespace:HslControls.WPF;assembly=HslControls"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        x:Class="AS_MQTTClient.Views.MainWindow"
+         Name="mainWindow"
+        mc:Ignorable="d"
+        DataContext="{StaticResource MainVM}"
+        
+        Title="Test Tool for GateWay IoT developed by DL " Height="730" Width="1055" Loaded="Window_Loaded">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedWindowCommand}" 
+                                   CommandParameter="{Binding ElementName=mainWindow}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.Resources>
+        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource ButtonGeneric}">
+            <Setter Property="Height" Value="54"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Background" Value="white"/>
+            <Setter Property="Foreground" Value="#FF121010"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style x:Key="defaultRadioStyle" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="#88949A"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid>
+                            <Border x:Name="border" Margin="20 0 20 0"/>
+                            <ContentPresenter x:Name="contentPresenter" Grid.Column="1" Focusable="False" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" 
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="#8CEDCB"/>
+                                <Setter Property="BorderBrush" Value="#8CEDCB" TargetName="border"/>
+                                <Setter Property="BorderThickness" Value="0 0 0 4" TargetName="border"/>
+                            </Trigger>
+
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="BorderThickness" Value="0" TargetName="border"/>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+        <Storyboard x:Key="Show_Home">
+
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="group_Connection">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="groupDisplay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_GateWay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_AboutUs">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="Grid_Welcome">
+                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="Show_Connection">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="Grid_Welcome">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_GateWay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_AboutUs">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="groupDisplay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="group_Connection">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="Show_Display">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="Grid_Welcome">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_GateWay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_AboutUs">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="group_Connection">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="groupDisplay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="Show_GateWay">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="Grid_Welcome">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_AboutUs">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="group_Connection">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="groupDisplay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_GateWay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="Show_AboutUs">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="Grid_Welcome">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_GateWay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="group_Connection">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="groupDisplay">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Hidden}"/>
+            </ObjectAnimationUsingKeyFrames>
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="grid_AboutUs">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="Loaded">
+            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="csv1">
+                <DiscreteObjectKeyFrame KeyTime="0:0:0.1" Value="{x:Static Visibility.Visible}"/>
+            </ObjectAnimationUsingKeyFrames>
+        </Storyboard>
+    </Window.Resources>
+    <Window.Triggers>
+        <!--<EventTrigger RoutedEvent="FrameworkElement.Loaded">
+            <BeginStoryboard x:Name="Show_Home_BeginStoryboard" Storyboard="{StaticResource Show_Home}"/>
+        </EventTrigger>-->
+        <EventTrigger RoutedEvent="ToggleButton.Checked" SourceName="btnHome">
+            <BeginStoryboard x:Name="Show_Home_BeginStoryboard" Storyboard="{StaticResource Show_Home}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ToggleButton.Checked" SourceName="btnConnection">
+            <BeginStoryboard x:Name="Show_Connection_BeginStoryboard" Storyboard="{StaticResource Show_Connection}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ToggleButton.Checked" SourceName="btnDisplay">
+            <BeginStoryboard x:Name="Show_Display_BeginStoryboard" Storyboard="{StaticResource Show_Display}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ToggleButton.Checked" SourceName="btnGateWay">
+            <BeginStoryboard x:Name="Show_GateWay_BeginStoryboard" Storyboard="{StaticResource Show_GateWay}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ToggleButton.Checked" SourceName="btnAboutUs">
+            <BeginStoryboard x:Name="Show_AboutUs_BeginStoryboard" Storyboard="{StaticResource Show_AboutUs}"/>
+        </EventTrigger>
+    </Window.Triggers>
+
+    <Grid x:Name="csv1" Margin="0,0,0,-6"   >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="69*"/>
+            <RowDefinition Height="661*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="39*"/>
+            <ColumnDefinition Width="71*"/>
+            <ColumnDefinition Width="101*"/>
+        </Grid.ColumnDefinitions>
+        <!--Header-->
+        <Grid Grid.ColumnSpan="3" Grid.Row="0" Margin="0,0,0,16">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50*"/>
+                <ColumnDefinition Width="161*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Height="54" Width="238">
+                <!--<Border CornerRadius="30" Width="30" Height="30" Background="#59E6B5"/>
+                <Border CornerRadius="30" Width="30" Height="30" Background="#FF7900" Margin="-5 0 0 0"/>-->
+                <Image Source="pack://application:,,,/ImageResources/as logo.png"/>
+                <TextBlock Text="AS MQTT Test Tool" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Foreground="#4F5050" Margin="0,-0.3,0,0" Width="161"/>
+            </StackPanel>
+
+            <UniformGrid Columns="5" Grid.Column="1">
+                <RadioButton IsChecked="True" x:Name="btnHome" Style="{StaticResource defaultRadioStyle}" Margin="0,0,25,0" >
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xe602;" FontSize="18" FontFamily="pack://application:,,,/Fonts/#iconfont" VerticalAlignment="Center"/>
+                        <TextBlock Text="Home" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton x:Name="btnConnection" Style="{StaticResource defaultRadioStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xe647;" FontSize="18" FontFamily="pack://application:,,,/Fonts/#iconfont" VerticalAlignment="Center"/>
+                        <TextBlock Text="Connection" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton x:Name="btnDisplay" Style="{StaticResource defaultRadioStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xe501;" FontSize="18" FontFamily="pack://application:,,,/Fonts/#iconfont" VerticalAlignment="Center"/>
+                        <TextBlock Text="Display" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton x:Name="btnGateWay" Style="{StaticResource defaultRadioStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xe623;" FontSize="18" FontFamily="pack://application:,,,/Fonts/#iconfont" VerticalAlignment="Center"/>
+                        <TextBlock Text="About GateWay" Margin="10 0 0 0" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </RadioButton>
+
+                <RadioButton x:Name="btnAboutUs" Style="{StaticResource defaultRadioStyle}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xe502;" FontSize="18" FontFamily="pack://application:,,,/Fonts/#iconfont" VerticalAlignment="Center" Width="23" Height="15"/>
+                        <TextBlock Text="Report" Margin="8 0 0 0" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                    </StackPanel>
+                </RadioButton>
+
+            </UniformGrid>
+
+        </Grid>
+        <!--Welcome-->
+        <Grid Background="#59E6B5" Grid.ColumnSpan="3" x:Name="Grid_Welcome" Margin="0,5,0,0" Grid.Row="1" Visibility="Hidden"  >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100*"/>
+                <ColumnDefinition Width="111*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="565*"/>
+                <RowDefinition Height="91*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,7,0" Grid.RowSpan="2">
+                <local:SpotLight Text="Welcome To" Height="60" Background="{x:Null}" Margin="-88,48,0,0" Width="514" HorizontalAlignment="Left" FontSize="50"/>
+                <local:SpotLight Text="IoT GateWay" Height="105" Background="{x:Null}" FontSize="60" Width="547" Margin="-200,0,0,0"/>
+                <TextBlock Height="90" FontSize="22" Width="643" HorizontalAlignment="Center" TextAlignment="Center" Foreground="White" FontWeight="Bold" FontFamily="Rockwell"><Run Text="This tool is developed to show the application"/><LineBreak/><Run Text=" of our IoT GateWay"/></TextBlock>
+                <StackPanel Orientation="Horizontal" Height="291" Width="495">
+                    <StackPanel Width="75" Margin="10,30,0,0" Height="231">
+                        <Image Source="pack://application:,,,/ImageResources/icons8-facebook-24 (1).png" Height="40" Width="59"/>
+                        <Image Source="pack://application:,,,/ImageResources/icons8-www-64.png" Height="35" Width="60" Margin="0,10,0,0"/>
+                        <Image Source="pack://application:,,,/ImageResources/icons8-phone-50.png" Height="35" Width="65" Margin="0,10,0,0"/>
+
+                        <Image Source="pack://application:,,,/ImageResources/icons8-mail-50.png" Height="40" Width="65" Margin="0,10,0,0"/>
+                        <Image Source="pack://application:,,,/ImageResources/icons8-navigation-48.png" Height="40" Width="55" Margin="0,10,0,0"/>
+
+                    </StackPanel>
+                    <StackPanel Width="395" Height="239" Margin="0,30,0,0">
+                        <TextBlock Text="An Sinh Electrical- Automation Company" FontSize="18" Margin="0,7,0,0" FontWeight="Bold" FontStyle="Italic" Height="24"/>
+                        <TextBlock Text="https://iot-industrial.com.vn/" FontSize="18" Margin="0,25,0,0" FontStyle="Italic" FontWeight="Bold"/>
+                        <TextBlock Text="098 535 63 90" FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic"/>
+                        <TextBlock Text="ansinh.ansinhautomation@gmail.com" FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic"/>
+                        <TextBlock FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic" Height="57" RenderTransformOrigin="0.494,0.543"><Run Text=" 9- GS 13 Di An, Binh Duong Province, "/><LineBreak/><Run Text="Vietnam 75355"/></TextBlock>
+
+
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            <Grid Grid.Column="1" Margin="0,10,0,0" Grid.RowSpan="2">
+                <Image Source="pack://application:,,,/ImageResources/cf8a2b48c4600f3e5671-removebg-preview.png"/>
+            </Grid>
+        </Grid>
+
+        <!--GateWay-->
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_GateWay" Margin="0,5,0,6" Visibility="Visible" Background="#FF8CF1AE">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="108*"/>
+                <ColumnDefinition Width="103*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" x:Name="Gateway_features">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="271*"/>
+                    <RowDefinition Height="125*"/>
+                    <RowDefinition Height="251*"/>
+                </Grid.RowDefinitions>
+                <Image Grid.Row="0" Source="pack://application:,,,/ImageResources/cf8a2b48c4600f3e5671-removebg-preview.png" Margin="0,0,0,115" Grid.RowSpan="2"/>
+                <Border BorderThickness="2,2,2,2" CornerRadius="10,10,10,10" BorderBrush="#FF18C7A3" Margin="10,268,0,10" Grid.RowSpan="2">
+                    <StackPanel  Orientation="Vertical">
+                        <TextBlock Text="Intruduction" FontWeight="Bold" Margin="10,3,0,0" FontSize="16" Foreground="White"/>
+                        <TextBlock Height="76" Width="519" FontStyle="Italic" FontWeight="Bold" Foreground="Black" Margin="0,7,0,0"><Run Text="Gateway IOT with 4 input digital, 4 output relay output, 2 channels Analog input 4-20 mA, 2"/><LineBreak/><Run Text="channels Analog 0-10v operating source 24VDC. Integrated RS485 communication, Modbus"/><LineBreak/><Run Text=" TCP, Remote monitoring via MQTT Client. Designed and tested by industry standards, "/><LineBreak/><Run Text="configuration and operation are simple via web server."/></TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" BorderThickness="2,2,2,2" BorderBrush="#FF0A3E84" CornerRadius="10,10,10,10" Margin="10,1,0,10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="11*"/>
+                            <RowDefinition Height="73*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="243*"/>
+                            <ColumnDefinition Width="271*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Features" FontWeight="Bold" FontSize="18" Margin="10,3,260,203" FontStyle="Italic" Grid.ColumnSpan="2" Grid.RowSpan="2" Foreground="White"/>
+                        <StackPanel Grid.Row="1" Orientation="Vertical" Grid.ColumnSpan="2" Margin="0,0,260,0">
+                            <TextBlock Text="- Power Input: 24VDC" Margin="20,10,0,0" FontFamily="Arial Black" FontSize="14"/>
+                            <TextBlock Text="- 4 Digital Input 24VDC" Margin="20,15,0,0" FontFamily="Arial Black" FontSize="14"/>
+                            <TextBlock Text="- 4 Digital Output Relay" Margin="20,15,0,0" FontFamily="Arial Black" FontSize="14"/>
+
+                            <TextBlock Text="- 2 Analog Input 4-20mA" Margin="20,15,0,0" FontFamily="Arial Black" FontSize="14"/>
+
+                            <TextBlock Text="- 2 Analog Input 0-10V" Margin="20,15,0,0" FontFamily="Arial Black" FontSize="14"/>
+
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Grid.Row="1">
+                            <TextBlock Margin="0,10,0,0" FontFamily="Arial Black" FontSize="14" Height="50"><Run Text="- Support Modbus 485/TCP and"/><LineBreak/><Run Text=" MQTT protocols"/></TextBlock>
+
+                            <TextBlock Margin="0,10,0,0" FontFamily="Arial Black" FontSize="14" Height="50"><Run Text="- Support DHCP network "/><LineBreak/><Run Text="configuration"/></TextBlock>
+                            <TextBlock Margin="0,10,0,0" FontFamily="Arial Black" FontSize="14" Height="55"><Run Text="- Compatible with IEEE 802.11b/g"/><LineBreak/><Run Text=" standards"/></TextBlock>
+
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+            </Grid>
+            <Grid Grid.Column="1" x:Name="GateWay_diagram">
+
+            </Grid>
+        </Grid>
+
+        <!--AboutUs-->
+
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_AboutUs" Margin="0,5,0,0" Visibility="Visible" Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="146*"/>
+                <RowDefinition Height="501*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="229*"/>
+                    <ColumnDefinition Width="129*"/>
+                    <ColumnDefinition Width="314*"/>
+                    <ColumnDefinition Width="248*"/>
+                    <ColumnDefinition Width="135*"/>
+                </Grid.ColumnDefinitions>
+
+                <!--Select database-->
+                <StackPanel Grid.Column="0" >
+                    <ComboBox x:Name="cbDatabase" 
+                        Style="{StaticResource MaterialDesignFloatingHintComboBox}"
+                           materialDesign:TextFieldAssist.HasClearButton="True"
+                           materialDesign:TextFieldAssist.SuffixText="sw"
+                           materialDesign:TextFieldAssist.UnderlineBrush="BlueViolet"
+                           materialDesign:ColorZoneAssist.Mode="SecondaryLight"
+                           materialDesign:HintAssist.Hint="DataBase"
+                           materialDesign:HintAssist.HelperText="Select one DataBase"
+                        MinWidth="128" Height="56" Margin="10,0,0,0" Width="200" HorizontalAlignment="Left">
+                        <ComboBoxItem
+                                   Content="AS_MQTTClient" />
+                        <ComboBoxItem
+                                   Content="SCADA" />
+                        <ComboBoxItem
+                                    Content="BlazorWASMAPP" />
+                        <ComboBoxItem
+                                  Content="QuanLiKho" />
+                    </ComboBox>
+                    <ComboBox x:Name="cbDataTable"
+                             materialDesign:HintAssist.Hint="Table" Margin="10,20,0,0" Height="35" Width="200" HorizontalAlignment="Left">
+                        <ComboBoxItem
+                                Content="Modbus_Slave1" />
+                        <ComboBoxItem
+                                Content="Modbus_Slave2" />
+                        <ComboBoxItem
+                                Content="Modbus_Slave3" />
+                        <ComboBoxItem
+                                   Content="Modbus_Slave4" />
+                    </ComboBox>
+                </StackPanel>
+                <!--Load Database table-->
+                <StackPanel Grid.Column="1" Orientation="Vertical">
+                    <Button Content="Read SQL" x:Name="btnReadDB" Width="94" Height="45" Margin="0,10,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="Load Table" x:Name="btnLoadTable" Width="94" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+
+                </StackPanel>
+
+
+                <StackPanel Grid.Column="2" Orientation="Vertical">
+                    <DatePicker x:Name="Dp_FromDate"
+                        Width="264"
+                        materialDesign:HintAssist.Hint="From Date"
+                        materialDesign:TextFieldAssist.HasClearButton="True"
+                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Height="60" Background="Transparent" />
+                    <DatePicker x:Name="Dp_ToDate"
+                        Width="260"
+                        materialDesign:HintAssist.Hint="To Date"
+                        materialDesign:TextFieldAssist.HasClearButton="True"
+                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Height="52" />
+
+                </StackPanel>
+                <StackPanel Grid.Column="3" Orientation="Vertical" Margin="10,0,10,0">
+                    <ComboBox
+                             materialDesign:HintAssist.Hint="Type Page" Margin="10,20,0,0" Height="35" Width="200" HorizontalAlignment="Left">
+                        <ComboBoxItem
+                                Content="A0" />
+                        <ComboBoxItem
+                                Content="A1" />
+                        <ComboBoxItem
+                                Content="A2" />
+                        <ComboBoxItem
+                                   Content="A3" />
+                        <ComboBoxItem
+                                   Content="A4" />
+                    </ComboBox>
+                    <Button Content="ShowData" x:Name="btnShowData" Width="133" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+
+                </StackPanel>
+                <StackPanel Grid.Column="4" Orientation="Vertical" Margin="10,0,10,0">
+                    <Button Content="Excel" x:Name="btnExcel" Width="94" Height="45" Margin="0,10,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="PDF" x:Name="btnPDF" Width="94" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1">
+                
+            </Grid>
+        </Grid>
+        <!--Connection-->
+        <Border x:Name="group_Connection" CornerRadius="10" Margin="0,1,0,10" Background="White" Grid.ColumnSpan="3" Visibility="Hidden" Grid.Row="1" >
+            <Grid Height="651" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="155*"/>
+                    <RowDefinition Height="45*"/>
+                    <RowDefinition Height="131*"/>
+                    <RowDefinition Height="60*"/>
+                    <RowDefinition Height="256*"/>
+                    <RowDefinition Height="0*"/>
+                </Grid.RowDefinitions>
+
+                <!--MQTT config-->
+
+                <StackPanel  Orientation="Vertical" Grid.Row="1" Margin="0,0,0,5">
+                    <TextBlock Text="MQTT Broker Profile Settings " Height="30" Width="1050" FontWeight="Bold" FontSize="20" Foreground="Black" Background="#FF36FFFA" TextAlignment="Center"/>
+                    <Border Height="111" BorderBrush="#FF46CBCE" CornerRadius="10,10,10,10" Width="1042" Margin="0,5,0,0" Background="#FFF3FFFF">
+                        <Grid Margin="-2,0,-2,0">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,64">
+                                <TextBlock Text="IPAddress:" Height="24" Margin="5,0,0,0" Foreground="Black" FontWeight="Bold" Width="89" TextAlignment="Center" FontSize="14"/>
+                                <TextBox Text="3.65.154.195" x:Name="txtIPAddress" Height="25" Margin="4,0,0,0" Background="{x:Null}" Foreground="Black" BorderBrush="Black" Width="111" TextAlignment="Center" FontSize="14"/>
+                                <TextBlock Text="Port:" Height="23" Margin="30,0,0,0" FontWeight="Bold" Width="44" FontSize="14" TextAlignment="Center" />
+                                <TextBox Text="1883" x:Name="txtPort" Height="24" Margin="4,-0.4,0,0" Background="{x:Null}" Foreground="Black" Width="46" FontSize="14" TextAlignment="Center" />
+                                <TextBlock Text="ReTimeOut:" Height="24" Margin="30,0,0,0" FontWeight="Bold" Width="96" FontSize="14" TextAlignment="Center"/>
+                                <TextBox Text="5000" x:Name="txtReTimeOut" Height="24" Background="{x:Null}" Foreground="Black" Width="66" FontSize="14" TextAlignment="Center" />
+                                <TextBlock Text="KeepAlive:" Margin="30,0,0,0" Height="24" FontWeight="Bold" Width="80" FontSize="14" TextAlignment="Center" />
+                                <TextBox Text="100" x:Name="txtKeepAlive" Background="{x:Null}" Margin="4,0,0,0" Height="23" Foreground="Black" Width="50" FontSize="14" TextAlignment="Center" />
+                                <CheckBox Content="RSA Encryption" x:Name="checkEncryption" Margin="30,-0.5,0,0" Height="21" Width="140" Foreground="Black" FontWeight="Bold" FontSize="14"/>
+
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,48,0,4">
+                                <TextBlock Text="ClientID:" Height="20" FontWeight="Bold" Margin="30,0,0,0" FontSize="14"/>
+                                <TextBox x:Name="txtClientID" Width="126" Margin="4,0,0,0" Background="{x:Null}" Height="26" BorderBrush="Black"/>
+                                <TextBlock Text="UserName:" Margin="30,0,0,0" Height="20" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
+                                <TextBox x:Name="txtUserName" Text="AnSinh" Background="{x:Null}" Height="24" Margin="4,0,0,0" Width="52" Foreground="Black" FontSize="14" />
+                                <TextBlock Text="PassWord:" Margin="30,0,0,0" Height="20" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
+                                <TextBox x:Name="txtPassWord" Text="ansinh123" Width="102" Height="24" Background="{x:Null}" Margin="4,0,0,0" FontSize="14"  />
+                                <Button x:Name="btnConnect" Content="Connect" Click="btnConnect_Click" Margin="120,-0.7,30,0" Height="47" Background="#FF88F0FB" BorderBrush="#FFC8C8C8" FontWeight="Bold" Foreground="Black" Width="96" FontSize="20" />
+                                <Button x:Name="btnDisconnect" Content="Disconnect" Click="btnDisconnect_Click" Height="47" Background="#FF88F0FB" FontWeight="Bold" Foreground="Black" Width="125" FontSize="20" Margin="10,2,2,2" />
+
+                            </StackPanel>
+                            <!--<StackPanel Orientation="Horizontal" Margin="0,79,0,0">
+                                -->
+                            <!--<Button x:Name="btnConnect" Content="Connect" Click="btnConnect_Click" Margin="300,0,30,0" Height="24" Background="#FF88F0FB" BorderBrush="#FFC8C8C8" FontWeight="Bold" Foreground="Black" Width="76" FontSize="14" />
+                                <Button x:Name="btnDisconnect" Content="Disconnect" Click="btnDisconnect_Click" Height="24" Background="#FF88F0FB" FontWeight="Bold" Foreground="Black" Width="89" FontSize="14" />-->
+                            <!--
+
+                            </StackPanel>-->
+                        </Grid>
+                    </Border>
+                </StackPanel>
+                <!--topic-->
+                <StackPanel x:Name="GridTopic" Orientation="Horizontal" Grid.Row="1" Margin="0,150,0,5" Grid.RowSpan="2">
+                    <TextBlock Text="Topic:" VerticalAlignment="Center" FontWeight="Bold" Height="29" Margin="50,0,0,0" Width="55" FontSize="18"/>
+                    <TextBox Text="70804dd7d1e23c7e/relay" x:Name="txtTopic" Width="925" Height="35" TextAlignment="Left" VerticalAlignment="Center" Margin="7,0,0,0" Background="{x:Null}" BorderBrush="Black" FontSize="20"/>
+                </StackPanel>
+                <!--payload-->
+                <Border x:Name="GridMessage" Grid.Row="3" Margin="10,4,10,2" BorderBrush="#FF39CCBB" CornerRadius="10,10,10,10" Background="#FFEAFFFF">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Payload:" Height="28" Margin="30,-0.3,0,0" FontWeight="Bold" FontSize="18"/>
+                        <TextBox x:Name="txtPayLoad" Width="879" Height="109" BorderBrush="#FF948D8D" Background="{x:Null}" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </Border>
+                <!--retain-->
+                <StackPanel x:Name="GridPublish" Orientation="Horizontal" Grid.Row="4" Margin="0,1,0,0">
+                    <CheckBox Content="Retain?" x:Name="checkRetain" Margin="30,2,0,0" Height="24" FontSize="14" FontWeight="Bold"/>
+                    <Button x:Name="btnMostOne" Content="MostOne" Width="72" Margin="10,2,0,2" Click="btnMostOne_Click" Height="44" Background="#FF88F0FB" BorderThickness="2,2,2,2" BorderBrush="#FF738686" Foreground="Black" FontSize="14"/>
+                    <Button x:Name="btnLeastOne" Content="LeastOne" Margin="15,2,0,2" Click="btnLeastOne_Click" Height="44" Background="#FF88F0FB" Padding="1,1,1,1" BorderBrush="#FF7398A7" BorderThickness="2,2,2,2" Foreground="Black" Width="69" FontSize="14"/>
+                    <Button x:Name="btnExactOne" Content="ExactOne" Margin="15,2,0,2" Click="btnExactOne_Click" Height="44" BorderBrush="#FF45C8B3" Background="#FF88F0FB" BorderThickness="2,2,2,2" Foreground="Black" Width="71" FontSize="14"/>
+                    <Button x:Name="btnOnlyTransfer" Content="OnlyTransfer" Click="btnOnlyTransfer_Click" Height="44" BorderBrush="#FF27A99A" Background="#FF88F0FB" BorderThickness="2,2,2,2" Foreground="Black" Width="100" Margin="15,2,2,2" FontSize="14"/>
+                    <StackPanel Orientation="Vertical" Margin="20,2,0,0" Height="46" Width="118">
+                        <RadioButton IsChecked="True" x:Name="RaBtnAddDisplay" Content="Addition Display" FontWeight="Bold"/>
+                        <RadioButton Content="Overlay Display" Margin="0,5,0,0" x:Name="RabtnOverPlayDisPlay" Width="115" FontWeight="Bold" />
+                    </StackPanel>
+
+                    <StackPanel Orientation="Vertical" Width="53" Height="60" Margin="20,0,0,0">
+                        <RadioButton x:Name="radBtnText" Height="17" Content="Text" Margin="4,3,0,0" Width="59" FontWeight="Bold"/>
+                        <RadioButton x:Name="radBtnXML" Height="17" Content="XML" Margin="4,0,0,0" Width="54" FontWeight="Bold"/>
+                        <RadioButton IsChecked="True" Content="Json" x:Name="radBtnJson" Height="17" Margin="4,0,0,0" FontWeight="Bold"/>
+
+                    </StackPanel>
+                    <Button x:Name="btnSubcrible" Content="Subcrible" Margin="80,1.9,0,2" Click="btnSubcrible_Click" Height="46" BorderBrush="#FF7F7F7F" Background="#FF88F0FB" BorderThickness="2,2,2,2" Foreground="Black" Width="74" FontSize="14"/>
+                    <Button x:Name="btnUnsubCribe" Content="UnSubcrible" Margin="20,2,0,2" Click="btnUnsubCribe_Click" Height="41" Background="#FF88F0FB" BorderBrush="DarkGray" BorderThickness="2,2,2,2" Foreground="Black" Width="88" FontSize="14"/>
+                    <Button Content="Clear" x:Name="btnClear" Width="68" Height="45" Margin="20,0,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FF88F0FB" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+
+
+                </StackPanel>
+                <Grid x:Name="GridReceive" Grid.Row="5" Margin="0,9,0,0">
+                    <Border CornerRadius="10,10,10,10" BorderBrush="#FF36B5B2" Margin="10,0,10,21" Background="#FFEAFDFC">
+                        <StackPanel Orientation="Horizontal" Margin="0,-11,0,195">
+                            <TextBlock Text="Receive:" Height="21" Margin="20,0,0,0" FontWeight="Bold" FontSize="16"/>
+
+                        </StackPanel>
+                    </Border>
+
+
+                    <TextBox x:Name="txtReceive" Margin="20,31,0,47" Background="{x:Null}" BorderThickness="1,1,1,1" HorizontalAlignment="Left" Width="1010"/>
+
+
+                    <TextBlock x:Name="tblockReceivecount" Text="Receive Count:" FontWeight="Bold" Margin="20,200,0,26" FontSize="14"/>
+
+                </Grid>
+
+            </Grid>
+        </Border>
+
+        <!--Display-->
+        <Border x:Name="groupDisplay" CornerRadius="10" Margin="0,5,0,1" Background="White" Visibility="Hidden" Grid.ColumnSpan="3" Grid.Row="1" >
+            <Grid Height="651" VerticalAlignment="Top">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20*"/>
+                    <RowDefinition Height="101*"/>
+                    <RowDefinition Height="125*"/>
+                    <RowDefinition Height="280*"/>
+                    <RowDefinition Height="125*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0">
+                    <TextBlock Text="Digital and Analog IO" Background="#FF09E1F1" FontSize="14" FontWeight="Bold" TextAlignment="Center"/>
+                </Border>
+                <Border Grid.Row="1"  CornerRadius="10,10,10,10" BorderBrush="#FF51E1EC" Background="#FFE9FBE4" Margin="0,2,0,5">
+                    <Grid>
+                        <TextBlock Text="Digital Output" FontWeight="Bold" Margin="10,0,0,73"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+
+                            <local:HMISwitch x:Name="rl1" Margin="5,2,10,0" Height="46" Width="100" IsChecked="False" Click="rl1_Click"/>
+                            <local:HMISwitch x:Name="rl2" Margin="10,5,0,0" Height="48" Width="100" IsChecked="False" Click="rl2_Click"/>
+                            <local:HMISwitch x:Name="rl3" Margin="40,5,0,5" Height="48" Width="100" Click="rl3_Click"/>
+                            <local:HMISwitch x:Name="rl4" Height="48" Width="100" Margin="40,0,0,0" Click="rl4_Click"/>
+
+
+                        </StackPanel>
+                        <TextBlock Text="Relay 0" Margin="40,14,428,55" FontWeight="Bold"/>
+                        <TextBlock Text="Relay 1" Margin="157,1,310,68" FontWeight="Bold"/>
+                        <TextBlock Text="Relay 2" Margin="293,1,176,68" RenderTransformOrigin="0.545,0.447" FontWeight="Bold"/>
+                        <TextBlock Text="Relay 3" Margin="431,1,34,68" FontWeight="Bold"/>
+
+
+                    </Grid>
+
+
+                </Border>
+                <Border Grid.Row="2" BorderBrush="#FF0CBFC3" CornerRadius="10,10,10,10" Background="#FFE1FDE9" Margin="0,4,0,275" Grid.RowSpan="2">
+                    <Grid>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,99">
+                            <TextBlock Text="Digital Input" FontWeight="Bold" Margin="10,0,0,0"/>
+                            <TextBlock Text="High/Low" FontWeight="Bold" Margin="50,0,0,0"/>
+
+                            <TextBlock Text="Counter" FontWeight="Bold" Margin="75,-1,0,0"/>
+                            <TextBlock Text="Current Counter" FontWeight="Bold" Margin="85,0,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                            <StackPanel Orientation="Vertical" Width="43" Margin="20,0,0,0" Height="104">
+                                <TextBlock Text="In0" TextAlignment="Center" Margin="0,5,0,0" FontWeight="Bold"/>
+                                <TextBlock Text="In1" TextAlignment="Center" Width="33" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <TextBlock Text="In2" TextAlignment="Center" Margin="0,10,0,0" FontWeight="Bold"/>
+                                <TextBlock Text="In3" TextAlignment="Center" Margin="0,10,0,0" FontWeight="Bold"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Height="102" Width="45" Margin="70,-0.3,0,0" IsEnabled="False">
+
+                                <local:HMISwitch x:Name="digitalstate1" Margin="0,2,0,0"/>
+                                <local:HMISwitch x:Name="digitalstate2" Margin="0,5,0,0"/>
+                                <local:HMISwitch x:Name="digitalstate3" Margin="0,5,0,5"/>
+                                <local:HMISwitch x:Name="digitalstate4"/>
+                            </StackPanel>
+                            <Border Margin="70,0,0,0" CornerRadius="10,10,10,10" Background="#FFD0D0D0" Height="102">
+                                <StackPanel Orientation="Vertical" Width="79">
+                                    <TextBox IsReadOnly="True"  x:Name="counter0" Width="74" Height="20" Margin="0,5,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True"  x:Name="counter1" Width="74" Margin="0,10,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True" x:Name="counter2" Width="74" Margin="0,5,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True" x:Name="counter3" Width="74" Margin="0,4,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FFDBDCDA" Width="80" Margin="70,0,0,0" CornerRadius="10,10,10,10" Height="102">
+                                <StackPanel Orientation="Vertical" Width="74">
+                                    <TextBox IsReadOnly="True"  x:Name="cur_counter0" Width="74" Margin="0,5,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True"  x:Name="cur_counter1" Width="74" Margin="0,10,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True" x:Name="cur_counter2" Width="74" Margin="0,8,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                    <TextBox IsReadOnly="True" x:Name="cur_counter3" Width="74" Margin="0,4,0,0" TextAlignment="Center" BorderBrush="{x:Null}"/>
+                                </StackPanel>
+                            </Border>
+
+
+                        </StackPanel>
+                    </Grid>
+
+                </Border>
+                <Border Grid.Row="3" CornerRadius="10,10,10,10" BorderBrush="#FF2CC6DA" Margin="0,20,0,10" Grid.RowSpan="2" Background="#FFF1F1F1">
+                    <Grid Margin="0,0,-1,0">
+                        <TextBlock Text="Analog Input" FontWeight="Bold" Margin="10,0,424,354"/>
+
+                        <!--<TextBlock Text="In0" Margin="61,121,934,139"/>
+                        <TextBlock Text="In1" Margin="187,121,500,136"/>
+                        <TextBlock Text="In2" Margin="331,121,355,136"/>
+                        <TextBlock Text="In3" Margin="467,121,225,136"/>-->
+
+                        <WPF:HslCurve x:Name="hslCurve4" HorizontalAlignment="Center" Margin="0,159,0,0" VerticalAlignment="Top" Height="204" Width="514" ValueMaxRight="35" ValueMinRight="34" ValueMaxLeft="25" Title="Voltage-Temperature" ValueMinLeft="15" ColorLinesAndText="#FF082903" ColorDashLines="Black"/>
+                        <!--<WPF:HslThermometer x:Name="gauseA2" HorizontalAlignment="Left" Margin="304,0,0,0" VerticalAlignment="Top" Height="249" Width="138" Value="41" ValueStart="-50" ValueMax="200" FontSize="7"/>
+                        <WPF:HslThermometer x:Name="gauseA3" HorizontalAlignment="Left" Margin="447,0,0,0" VerticalAlignment="Top" Height="300" Width="130" Value="39"/>-->
+
+                        <StackPanel Orientation="Horizontal" Margin="0,19,4,229">
+                            <WPF:HslArcGauge x:Name="gauseA0" Height="109" Width="107" Max="50" Value="35" Margin="10,-6,0,0" GaugeTitle="Voltage" GaugeColor="#FF3AE222" Min="10" SettingValue="20" SettingGaugeColor="White"/>
+                            <WPF:HslArcGauge x:Name="gauseA1" Max="50" Value="45" GaugeTitle="Voltage" GaugeColor="#FF007ECE" Min="10" SettingValue="20" Margin="19.9,3,0,15" Height="107" Width="105" SettingGaugeColor="White"/>
+                            <WPF:HslArcGauge x:Name="gauseA2" Max="200" Value="56" GaugeTitle="Temperature" GaugeColor="White" SettingValue="30" Margin="20,3,10,15" Height="106" Width="105" SettingGaugeColor="White" Min="-50"/>
+                            <WPF:HslArcGauge x:Name="gauseA3" Max="200" Value="15" GaugeTitle="Temperature" GaugeColor="#FFCEAA00" SettingValue="20" Margin="7,5,454,15" Height="104" Width="105" SettingGaugeColor="#FFB1F700"/>
+
+                        </StackPanel>
+                    </Grid>
+
+                </Border>
+
+
+                <Border Grid.ColumnSpan="2" Margin="516,0,0,0">
+                    <TextBlock Text="Modbus Master" FontWeight="Bold" FontSize="14" TextAlignment="Center" Background="#FF09E1F1"/>
+                </Border>
+                <Border Grid.Column="1" Grid.Row="1" BorderBrush="#FFB2BDC8" CornerRadius="10,10,10,10" Margin="10,5,10,62" Grid.RowSpan="2" Background="#FFDBFDFC">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="24*"/>
+                            <RowDefinition Height="131*"/>
+
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Slave1: Soil NPK Sensor" FontWeight="Bold" Margin="10,0,0,0"/>
+                        <WPF:HslBarChart x:Name="hslBarChart1" Grid.Row="1" ValueMaxLeft="500" ValueSegment="4" Margin="0,0,10,0" />
+                    </Grid>
+
+                </Border>
+                <Border Grid.Column="1" Grid.Row="2" BorderBrush="#FF54C2E8" CornerRadius="10,10,10,10" Margin="10,68,10,77" Grid.RowSpan="2" Background="#FFE9FBE4">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="5*"/>
+                            <RowDefinition Height="33*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Slave2: PLC Mitsubishi" FontWeight="Bold" Margin="10,0,0,10"/>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                            <WPF:HslThermometer x:Name="HslThermometer_1"  Margin="10,0,0,0" SegmentCount="2" Width="110" Value="17" />
+                            <WPF:HslThermometer x:Name="HslThermometer_2"  Margin="50,0,0,0" SegmentCount="2" Width="130" TemperatureColor="#FF1998C3" Value="58" ValueStart="-150" />
+                            <WPF:HslThermometer x:Name="HslThermometer_3"  Margin="50,0,0,0" SegmentCount="2" Width="90" TemperatureColor="#FF1DBD18" Value="58" ValueStart="-150" />
+
+                        </StackPanel>
+
+                    </Grid>
+
+                </Border>
+                <Border Grid.Column="1" Grid.Row="3" BorderBrush="#FF2FD3E8" CornerRadius="10,10,10,10" Margin="10,208,10,10" Grid.RowSpan="2" Background="#FFE9FBE4">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="10*"/>
+                            <RowDefinition Height="51*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBlock Grid.Row="0" Text="Slave3: PLC Allen-Bradley" FontWeight="Bold" Margin="10,0,0,4"/>
+                            <Button Content="Load" x:Name="btnLoad" Height="24" Background="#FF1B966C" Click="btnLoad_Click" Margin="265,2,2,2" Width="55"/>
+                        </StackPanel>
+
+                        <lvc:CartesianChart AnimationsSpeed="0:0:0.5" Hoverable="False" DataTooltip="{x:Null}" Margin="10,4,10,10" Grid.Row="1">
+                            <lvc:CartesianChart.Series>
+                                <lvc:LineSeries Values="{Binding ChartValues}" 
+                                PointGeometry="{x:Null}" 
+                                LineSmoothness="1"
+                                StrokeThickness="4" 
+                                Stroke="#FFFF0C00"                                       
+                                Fill="Transparent"/>
+                            </lvc:CartesianChart.Series>
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis LabelFormatter="{Binding DateTimeFormatter}" 
+                          MaxValue="{Binding AxisMax}" 
+                          MinValue="{Binding AxisMin}"
+                          Unit="{Binding AxisUnit}">
+                                    <lvc:Axis.Separator>
+                                        <lvc:Separator Step="{Binding AxisStep}" />
+                                    </lvc:Axis.Separator>
+                                </lvc:Axis>
+                            </lvc:CartesianChart.AxisX>
+                        </lvc:CartesianChart>
+
+                    </Grid>
+                </Border>
+                <!--<Border Grid.Column="1" Grid.Row="4" BorderThickness="2,2,2,2" BorderBrush="#FF40CA25" CornerRadius="10,10,10,10" Margin="10,0,10,5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="19*"/>
+                            <RowDefinition Height="63*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Slave4: PLC Allen-Bradley" FontWeight="Bold" Margin="10,0,0,0"/>
+                    </Grid>
+                </Border>-->
+
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
