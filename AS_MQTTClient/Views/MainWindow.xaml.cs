@@ -34,6 +34,9 @@ namespace AS_MQTTClient.Views
 
 
         MainViewModel mainVM = new MainViewModel();
+        
+
+       DispatcherTimer TimerArchive = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
@@ -221,7 +224,6 @@ namespace AS_MQTTClient.Views
                           }
                       }
                       else if (radBtnJson.IsChecked == true)
-
                       {
                           try
                           {   
@@ -246,8 +248,6 @@ namespace AS_MQTTClient.Views
                                       rl4.IsChecked = (bool)stateofrelay.relay[3];
 
                                   }
-
-
                                  //analog
                               if (analog.processed_value != null)
                               {
@@ -256,29 +256,24 @@ namespace AS_MQTTClient.Views
                                   gauseA2.Value = (double)analog.processed_value[2];
                                   gauseA3.Value = (double)analog.processed_value[3];
                                   hslCurve4.AddCurveData(new string[] { "A", "B", "C", "D" },
-                        new float[]
-                            {
+                                 new float[]
+                                     {
                                     (float)analog.processed_value[0],
                                     (float)analog.processed_value[1],
                                     (float)analog.processed_value[2],
                                      (float)analog.processed_value[3],
                                      }
-                                );
+                                        );
 
                                   // insert
-                                         using (var db = DataProvider.Ins.DB)
-                                             {
-                                                  var data_analog = db.Data_Analog_1;
-                                                   data_analog.Add(new Data_Analog_1
-                                                {
-                                                         Id = Guid.New8Guid(),
-                                                         Ngay = DateTime.Now,
-                                                         Raw_valvue = analog.raw_value[0],
-                                                         Process_value = (float)analog.processed_value[0]
+                                  TimerArchive.Interval = new TimeSpan(0, 0, 30);
+                                  TimerArchive.Tick += (s, e) =>
+                                  {
+                                      InsertAnalog(analog.raw_value[1], analog.processed_value[1]);
+                                  };
+                                  TimerArchive.Start();
+                                       
 
-                                                });
-                                                     db.SaveChanges();
-                                  }
 
                               }
                                  // digital
@@ -305,12 +300,18 @@ namespace AS_MQTTClient.Views
                                   HslThermometer_1.Value = (float)modbus[1];
                                   HslThermometer_2.Value = (float)modbus[2];
                                   HslThermometer_3.Value = (float)modbus[3];
+
+                                  InsertModbus(modbus[1]);
                               }    
+
+                              
                           }
                           catch
                           {
-
+                              MessageBox.Show("Lỗi rồi");
                           }
+
+                        
                       }
                       if (RaBtnAddDisplay.IsChecked == true)
                           txtReceive.AppendText($"Topic[{topic}] " + msg + Environment.NewLine);
@@ -466,12 +467,45 @@ namespace AS_MQTTClient.Views
             public List<int> cur_counter { get; set;}
             public List<bool> digital_input { get; set;}
         }
+        #region lưu dữ liệu vào database
+        // data analog
+        void InsertAnalog (int rawvalue, double processvalue )
+        {
+            using (var db = DataProvider.Ins.DB)
+            {
+                var data_analog = db.Data_Analog_test;
+                data_analog.Add(new Data_Analog_test
+                {
+                    Id = Guid.NewGuid(),
+                    Ngay = DateTime.Now,
+                    Raw_value = rawvalue,
+                    Process_value = (float)processvalue
 
-       
+                });
+                db.SaveChanges();
+            }
+        }
+        void InsertModbus (double modbus)
+        {
+            using (var db = DataProvider.Ins.DB)
+            {
+                var data_modbus = db.Data_modbus_test;
+                data_modbus.Add(new Data_modbus_test
+                {
+                    Id = Guid.NewGuid(),
+                    Ngay = DateTime.Now,
+                    EnergyTotal = modbus,
+                });
+
+
+                db.SaveChanges();
+            }
+        }
+        #endregion
 
 
         //public int test1;
-     
+
         // here code send json to gateway
 
         #region điều khiển bật tắt relay

@@ -113,10 +113,10 @@
     </ApplicationDefinition>
     <Compile Include="Controls\SpotLight.cs" />
     <Compile Include="Model\DataProvider.cs" />
-    <Compile Include="Model\Data_Analog_1.cs">
+    <Compile Include="Model\Data_Analog_test.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Model\Modbus_slave_MFM383A.cs">
+    <Compile Include="Model\Data_modbus_test.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Model\Model1.Context.cs">

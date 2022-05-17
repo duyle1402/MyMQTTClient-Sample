@@ -4,27 +4,24 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="AS_MQTTClientModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Data_Analog_1">
+      <Schema Namespace="AS_MQTTClientModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Data_Analog_test">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="Raw_valvue" Type="real" />
-          <Property Name="Process_value" Type="real" />
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Ngay" Type="datetime" />
+          <Property Name="Raw_value" Type="float" />
+          <Property Name="Process_value" Type="float" />
         </EntityType>
-        <EntityType Name="Modbus_slave_MFM383A">
+        <EntityType Name="Data_modbus_test">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Ngay" Type="datetime" />
-          <Property Name="I_Avg" Type="real" />
-          <Property Name="P_Sum" Type="real" />
-          <Property Name="Q_Sum" Type="real" />
-          <Property Name="S_Sum" Type="real" />
-          <Property Name="Energy_Total" Type="real" />
+          <Property Name="EnergyTotal" Type="float" />
+          <Property Name="Q_sum" Type="float" />
         </EntityType>
         <EntityType Name="UserRole">
           <Key>
@@ -56,8 +53,8 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="AS_MQTTClientModelStoreContainer">
-          <EntitySet Name="Data_Analog_1" EntityType="Self.Data_Analog_1" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Modbus_slave_MFM383A" EntityType="Self.Modbus_slave_MFM383A" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Data_Analog_test" EntityType="Self.Data_Analog_test" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Data_modbus_test" EntityType="Self.Data_modbus_test" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="UserRole" EntityType="Self.UserRole" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK__Users__IdRole__38996AB5" Association="Self.FK__Users__IdRole__38996AB5">
@@ -65,10 +62,29 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="AS_MQTTClientModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Data_Analog_test">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Ngay" Type="DateTime" Precision="3" />
+          <Property Name="Raw_value" Type="Double" />
+          <Property Name="Process_value" Type="Double" />
+        </EntityType>
+        <EntityType Name="Data_modbus_test">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" />
+          <Property Name="Ngay" Type="DateTime" Precision="3" />
+          <Property Name="EnergyTotal" Type="Double" />
+          <Property Name="Q_sum" Type="Double" />
+        </EntityType>
         <EntityType Name="UserRole">
           <Key>
             <PropertyRef Name="Id" />
@@ -100,43 +116,42 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="AS_MQTTClientEntities" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="AS_MQTTClientEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Data_Analog_test" EntityType="Self.Data_Analog_test" />
+          <EntitySet Name="Data_modbus_test" EntityType="Self.Data_modbus_test" />
           <EntitySet Name="UserRoles" EntityType="Self.UserRole" />
           <EntitySet Name="Users" EntityType="Self.User" />
           <AssociationSet Name="FK__Users__IdRole__38996AB5" Association="Self.FK__Users__IdRole__38996AB5">
             <End Role="UserRole" EntitySet="UserRoles" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
-          <EntitySet Name="Data_Analog_1" EntityType="AS_MQTTClientModel.Data_Analog_1" />
-          <EntitySet Name="Modbus_slave_MFM383A" EntityType="AS_MQTTClientModel.Modbus_slave_MFM383A" />
         </EntityContainer>
-        <EntityType Name="Data_Analog_1">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Raw_valvue" Type="Single" />
-          <Property Name="Process_value" Type="Single" />
-          <Property Name="Ngay" Type="DateTime" Precision="3" />
-        </EntityType>
-        <EntityType Name="Modbus_slave_MFM383A">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Ngay" Type="DateTime" Precision="3" />
-          <Property Name="I_Avg" Type="Single" />
-          <Property Name="P_Sum" Type="Single" />
-          <Property Name="Q_Sum" Type="Single" />
-          <Property Name="S_Sum" Type="Single" />
-          <Property Name="Energy_Total" Type="Single" />
-        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="AS_MQTTClientModelStoreContainer" CdmEntityContainer="AS_MQTTClientEntities">
+        <EntityContainerMapping StorageEntityContainer="AS_MQTTClientModelStoreContainer" CdmEntityContainer="AS_MQTTClientEntities1">
+          <EntitySetMapping Name="Data_Analog_test">
+            <EntityTypeMapping TypeName="AS_MQTTClientModel.Data_Analog_test">
+              <MappingFragment StoreEntitySet="Data_Analog_test">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="Raw_value" ColumnName="Raw_value" />
+                <ScalarProperty Name="Process_value" ColumnName="Process_value" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Data_modbus_test">
+            <EntityTypeMapping TypeName="AS_MQTTClientModel.Data_modbus_test">
+              <MappingFragment StoreEntitySet="Data_modbus_test">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
+                <ScalarProperty Name="EnergyTotal" ColumnName="EnergyTotal" />
+                <ScalarProperty Name="Q_sum" ColumnName="Q_sum" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="UserRoles">
             <EntityTypeMapping TypeName="AS_MQTTClientModel.UserRole">
               <MappingFragment StoreEntitySet="UserRole">
@@ -153,29 +168,6 @@
                 <ScalarProperty Name="UserName" ColumnName="UserName" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="IdRole" ColumnName="IdRole" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Data_Analog_1">
-            <EntityTypeMapping TypeName="AS_MQTTClientModel.Data_Analog_1">
-              <MappingFragment StoreEntitySet="Data_Analog_1">
-                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
-                <ScalarProperty Name="Process_value" ColumnName="Process_value" />
-                <ScalarProperty Name="Raw_valvue" ColumnName="Raw_valvue" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Modbus_slave_MFM383A">
-            <EntityTypeMapping TypeName="AS_MQTTClientModel.Modbus_slave_MFM383A">
-              <MappingFragment StoreEntitySet="Modbus_slave_MFM383A">
-                <ScalarProperty Name="Energy_Total" ColumnName="Energy_Total" />
-                <ScalarProperty Name="S_Sum" ColumnName="S_Sum" />
-                <ScalarProperty Name="Q_Sum" ColumnName="Q_Sum" />
-                <ScalarProperty Name="P_Sum" ColumnName="P_Sum" />
-                <ScalarProperty Name="I_Avg" ColumnName="I_Avg" />
-                <ScalarProperty Name="Ngay" ColumnName="Ngay" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

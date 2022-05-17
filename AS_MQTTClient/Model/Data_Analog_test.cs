@@ -12,14 +12,11 @@ namespace AS_MQTTClient.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class Modbus_slave_MFM383A
+    public partial class Data_Analog_test
     {
-        public int Id { get; set; }
+        public System.Guid Id { get; set; }
         public Nullable<System.DateTime> Ngay { get; set; }
-        public Nullable<float> I_Avg { get; set; }
-        public Nullable<float> P_Sum { get; set; }
-        public Nullable<float> Q_Sum { get; set; }
-        public Nullable<float> S_Sum { get; set; }
-        public Nullable<float> Energy_Total { get; set; }
+        public Nullable<double> Raw_value { get; set; }
+        public Nullable<double> Process_value { get; set; }
     }
 }
