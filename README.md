@@ -5,7 +5,7 @@ In this project, I try to connect Iot gateway using MQTT Protocol.
 I can visualize, control the data from the decives which is connected to the gateway like PLC, sensor, other industrial devices...
 I used SQL Server to save the data i had read from the gateway.
 
-##Tech Stack: 
+#Tech Stack: 
    WPF  
   SQL Server 
   
