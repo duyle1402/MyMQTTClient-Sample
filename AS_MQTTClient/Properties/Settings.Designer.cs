@@ -22,5 +22,16 @@ namespace AS_MQTTClient.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=AS_MQTTClient;Integrated Secur" +
+            "ity=True")]
+        public string AS_MQTTClientConnectionString {
+            get {
+                return ((string)(this["AS_MQTTClientConnectionString"]));
+            }
+        }
     }
 }

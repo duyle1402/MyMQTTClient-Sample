@@ -22,21 +22,27 @@ using LiveCharts.Configurations;
 using System.Threading.Tasks;
 using AS_MQTTClient.ViewModel;
 using AS_MQTTClient.Model;
+using System.Data.Entity;
+using System.Data.SqlClient;
+using System.Windows.Controls;
+using Microsoft.Office.Interop.Excel;
+
 
 namespace AS_MQTTClient.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, INotifyPropertyChanged
+    public partial class MainWindow : System.Windows.Window, INotifyPropertyChanged
     {
         //ModelImporter import = new ModelImporter();
 
 
         MainViewModel mainVM = new MainViewModel();
         
+       DispatcherTimer TimerArchive_analog = new DispatcherTimer();
+       DispatcherTimer TimerArchive_modbus = new DispatcherTimer();
 
-       DispatcherTimer TimerArchive = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
@@ -91,13 +97,7 @@ namespace AS_MQTTClient.Views
         protected override void OnSourceInitialized(EventArgs e)
         {
             base.OnSourceInitialized(e);
-
-            // timer
-            //DispatcherTimer timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromMilliseconds(300);
-            //timer.Tick += timer_Tick;
-            //timer.Start();
-
+         
             // linechart
             hslCurve4.SetLeftCurve("A", null, Colors.LightSkyBlue);
             hslCurve4.SetLeftCurve("B", null, Colors.Tomato);
@@ -107,13 +107,7 @@ namespace AS_MQTTClient.Views
             hslBarChart1.SetDataSource(new int[] { 100, 200, 400 }, new string[] { "Nitrogen", "Phosphous", "Potassium"});
 
         }
-        //private void timer_Tick(object sender, EventArgs e)
-        //{
-        //    count_tick++;
-
-        //    if (count_tick > 10000) count_tick = 0;
-        //}
-
+     
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             btnDisconnect.IsEnabled = false;
@@ -137,9 +131,9 @@ namespace AS_MQTTClient.Views
                 KeepAlivePeriod = TimeSpan.FromSeconds(int.Parse(txtKeepAlive.Text)),
                 UseRSAProvider = (bool)checkEncryption.IsChecked,
             };
-            if (!string.IsNullOrEmpty(txtUserName.Text) || !string.IsNullOrEmpty(txtPassWord.Text))
+            if (!string.IsNullOrEmpty(txtUserName.Text) || !string.IsNullOrEmpty(txtPassWord.Password))
             {
-                options.Credentials = new MqttCredential(txtUserName.Text, txtPassWord.Text);
+                options.Credentials = new MqttCredential(txtUserName.Text, txtPassWord.Password);
             }
 
 
@@ -207,7 +201,7 @@ namespace AS_MQTTClient.Views
         {
             try
             {
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.Invoke(new System.Action(() =>
                   {
                       receiveCount++;
                       tblockReceivecount.Text = "receive Count:" + receiveCount;
@@ -231,14 +225,11 @@ namespace AS_MQTTClient.Views
                               
                               Relay stateofrelay = JsonConvert.DeserializeObject<Relay>(msg);
 
-
                               Analog analog = JsonConvert.DeserializeObject<Analog>(msg);
 
                               Digital digital = JsonConvert.DeserializeObject<Digital>(msg);
 
-                              Dictionary<int,int> modbus = JsonConvert.DeserializeObject<Dictionary<int, int>>(msg);
-
-                               
+                              Dictionary<int,int> modbus = JsonConvert.DeserializeObject<Dictionary<int, int>>(msg);                             
                                   // relay
                                   if (stateofrelay.relay != null)
                                   {
@@ -246,7 +237,6 @@ namespace AS_MQTTClient.Views
                                       rl2.IsChecked = (bool)stateofrelay.relay[1];
                                       rl3.IsChecked = (bool)stateofrelay.relay[2];
                                       rl4.IsChecked = (bool)stateofrelay.relay[3];
-
                                   }
                                  //analog
                               if (analog.processed_value != null)
@@ -264,17 +254,13 @@ namespace AS_MQTTClient.Views
                                      (float)analog.processed_value[3],
                                      }
                                         );
-
                                   // insert
-                                  TimerArchive.Interval = new TimeSpan(0, 0, 30);
-                                  TimerArchive.Tick += (s, e) =>
+                                  TimerArchive_analog.Interval = new TimeSpan(0, 0, 30);
+                                  TimerArchive_analog.Tick += (s, e) =>
                                   {
                                       InsertAnalog(analog.raw_value[1], analog.processed_value[1]);
                                   };
-                                  TimerArchive.Start();
-                                       
-
-
+                                  TimerArchive_analog.Start();                                      
                               }
                                  // digital
                               if ((digital.counter != null) && (digital.cur_counter != null) && (digital.digital_input != null))
@@ -291,7 +277,6 @@ namespace AS_MQTTClient.Views
                                   digitalstate2.IsChecked = digital.digital_input[1];
                                   digitalstate3.IsChecked = digital.digital_input[2];
                                   digitalstate4.IsChecked = digital.digital_input[3];
-
                               }
                               // modbus
                               if(modbus!=null)
@@ -301,17 +286,18 @@ namespace AS_MQTTClient.Views
                                   HslThermometer_2.Value = (float)modbus[2];
                                   HslThermometer_3.Value = (float)modbus[3];
 
-                                  InsertModbus(modbus[1]);
-                              }    
-
-                              
+                                  TimerArchive_modbus.Interval = new TimeSpan(0,0,30);
+                                  TimerArchive_modbus.Tick += (s, e) =>
+                                  {
+                                      InsertModbus(modbus[1]);
+                                  };
+                                  TimerArchive_modbus.Start();
+                              }                                 
                           }
                           catch
                           {
                               MessageBox.Show("Lỗi rồi");
-                          }
-
-                        
+                          }                      
                       }
                       if (RaBtnAddDisplay.IsChecked == true)
                           txtReceive.AppendText($"Topic[{topic}] " + msg + Environment.NewLine);
@@ -324,13 +310,12 @@ namespace AS_MQTTClient.Views
             {
 
             }
-
         }
         private void LogNet_BeforeSaveToFile(object sender, HslCommunication.LogNet.HslEventArgs e)
         {
             try
             {
-                Dispatcher.Invoke(new Action(() =>
+                Dispatcher.Invoke(new System.Action(() =>
                 {
                     if (RaBtnAddDisplay.IsChecked == true)
                         txtReceive.AppendText(e.HslMessage.ToString() + Environment.NewLine);
@@ -341,7 +326,6 @@ namespace AS_MQTTClient.Views
 
             }
         }
-
         private void btnDisconnect_Click(object sender, RoutedEventArgs e)
         {
             // Disconnect
@@ -447,9 +431,9 @@ namespace AS_MQTTClient.Views
                 }
             }
         }
-      
-       
-      
+
+
+        
         // lưu trữ data, đặt tên phải giống cấu trúc chuỗi json nếu k bị lỗi 
         // save the data, class name must be equal json.name
         public class Relay
@@ -485,6 +469,7 @@ namespace AS_MQTTClient.Views
                 db.SaveChanges();
             }
         }
+        // modbus
         void InsertModbus (double modbus)
         {
             using (var db = DataProvider.Ins.DB)
@@ -502,8 +487,7 @@ namespace AS_MQTTClient.Views
             }
         }
         #endregion
-
-
+        
         //public int test1;
 
         // here code send json to gateway
@@ -511,117 +495,70 @@ namespace AS_MQTTClient.Views
         #region điều khiển bật tắt relay
         private void rl1_Click(object sender, RoutedEventArgs e)
         {
-            
-            if(rl1.IsChecked==true)
+            string topic = "70804dd7d1e23c7e/RL0";
+            if (rl1.IsChecked==true)
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL0",
-                    Payload = Encoding.UTF8.GetBytes("ON"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "ON");
             }    
             else
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL0",
-                    Payload = Encoding.UTF8.GetBytes("OFF"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "OFF");
             }    
         }
 
         private void rl2_Click(object sender, RoutedEventArgs e)
         {
+            string topic = "70804dd7d1e23c7e/RL1";
             if (rl2.IsChecked == true)
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL1",
-                    Payload = Encoding.UTF8.GetBytes("ON"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "ON");
             }
             else
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL1",
-                    Payload = Encoding.UTF8.GetBytes("OFF"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "OFF");
             }
         }
 
         private void rl3_Click(object sender, RoutedEventArgs e)
         {
+            string topic = "70804dd7d1e23c7e/RL2";
             if (rl3.IsChecked == true)
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL2",
-                    Payload = Encoding.UTF8.GetBytes("ON"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "ON");
             }
             else
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL2",
-                    Payload = Encoding.UTF8.GetBytes("OFF"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "OFF");
             }
         }
 
         private void rl4_Click(object sender, RoutedEventArgs e)
         {
+            string topic = "70804dd7d1e23c7e/RL3";
             if (rl4.IsChecked == true)
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL3",
-                    Payload = Encoding.UTF8.GetBytes("ON"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic,"ON");
             }
             else
             {
-                OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
-                {
-                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
-                    Topic = "70804dd7d1e23c7e/RL3",
-                    Payload = Encoding.UTF8.GetBytes("OFF"),
-                    Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
-                });
-
-                if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+                ControlRelay(topic, "OFF");
             }
         }
+
+      private void ControlRelay( string topic, string state)
+        {
+            OperateResult send = mqttClient.PublishMessage(new MqttApplicationMessage()
+            {
+                QualityOfServiceLevel = MqttQualityOfServiceLevel.AtMostOnce,
+                Topic = topic,
+                Payload = Encoding.UTF8.GetBytes(state),
+                Retain = (bool)checkRetain.IsChecked               // If TRUE, the message will be stored and stored on the server, which is convenient for the client to push immediately after connecting
+            });
+
+            if (!send.IsSuccess) MessageBox.Show("Send Failed:" + send.Message);
+        }
         #endregion
+
         //#region real time data using live chart
 
         //private double _axisMax;
@@ -692,6 +629,17 @@ namespace AS_MQTTClient.Views
       
         //#endregion
 
+     
+
+
+        // load data live chart
+        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            //IsReading = !IsReading;
+            if (mainVM.IsReading)
+
+                Task.Factory.StartNew(mainVM.Read);
+        }
         #region INotifyPropertyChanged implementation
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -703,17 +651,146 @@ namespace AS_MQTTClient.Views
         }
 
         #endregion
-
-
-        // load data live chart
-        private void btnLoad_Click(object sender, RoutedEventArgs e)
+       
+        #region show data sql
+        string sqlconnectstring = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AS_MQTTClient;Integrated Security=True";
+        private void btnReadSQL_Click(object sender, RoutedEventArgs e)
         {
-            //IsReading = !IsReading;
-            if (mainVM.IsReading)
+            cbDatabase.Items.Clear();
+                 
+            using (var sqlConnection = new SqlConnection(sqlconnectstring))
+            {
+                // chọn tất cả database có trong sql
+                string cmdText = @"SELECT name FROM master.dbo.sysdatabases WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb')";                
+                SqlCommand cmd = new SqlCommand(cmdText, sqlConnection);
+                sqlConnection.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while(reader.Read())
+                    {
+                        cbDatabase.Items.Add(reader.GetString(0));
+                    }
+                }         
+             }
 
-                Task.Factory.StartNew(mainVM.Read);
         }
 
-      
+        private void cbDatabase_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            cbDataTable.Items.Clear();
+            var table = cbDatabase.SelectedItem as string;
+            string catalog = "AS_MQTTClient";
+            if (table == catalog)
+            {
+                using (var sqlConnection = new SqlConnection(sqlconnectstring))
+                {
+                    // chọn tất cả database có trong sql
+                    string cmdText = @"SELECT Table_Name  FROM INFORMATION_SCHEMA.TABLES";
+                    SqlCommand cmd = new SqlCommand(cmdText, sqlConnection);
+                    sqlConnection.Open();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            cbDataTable.Items.Add(reader.GetString(0));
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                MessageBox.Show("Chọn lại cho đúng database MQTT!");
+            }
+
+        }
+
+        private void btnShowData_Click(object sender, RoutedEventArgs e)
+        {
+            var db = DataProvider.Ins.DB;
+            dgDataTest.ItemsSource = null;
+            string data = cbDataTable.SelectedItem as string;
+            string modbus = "Data_modbus_test";
+            string analog = "Data_Analog_test";
+            if (data == analog)
+            {
+                try
+                {
+
+                    if (DpFromDate.SelectedDate < DpToDate.SelectedDate && DpFromDate.SelectedDate != null && DpToDate.SelectedDate != null)
+                    {
+                        
+                        var query =
+                        from s in db.Data_Analog_test
+                        where s.Ngay >= DpFromDate.SelectedDate && s.Ngay <= DpToDate.SelectedDate
+                        select new { s.Ngay, s.Raw_value, s.Process_value };
+                        //dgDataTest.Items.Add(query.ToList());
+                        dgDataTest.ItemsSource = query.ToList();
+                    }             
+                    else
+                    {
+                        MessageBox.Show("Chọn lại ngày, ngày bắt đầu xem phải trước ngày kết thúc", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                              
+            }
+            if (data == modbus)
+            {
+                try
+                {
+
+                    if (DpFromDate.SelectedDate < DpToDate.SelectedDate && DpFromDate.SelectedDate != null && DpToDate.SelectedDate != null)
+                    {
+                      
+                        var query =
+                        from s in db.Data_modbus_test
+                        where s.Ngay >= DpFromDate.SelectedDate && s.Ngay <= DpToDate.SelectedDate
+                        select new { s.Ngay, s.EnergyTotal, s.Q_sum };
+                        //dgDataTest.Items.Add(query.ToList());
+                        dgDataTest.ItemsSource = query.ToList();
+                    }
+                    
+                    else
+                    {
+                        MessageBox.Show("Chọn lại ngày, ngày bắt đầu xem phải trước ngày kết thúc" ,"Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+        
+            }
+         
+        }
+        private void btnExcel_Click(object sender, RoutedEventArgs e)
+        {
+            ReportExcel();
+        }
+
+        private void btnPDF_Click(object sender, RoutedEventArgs e)
+        {
+            ReportPDF();
+        }
+        #endregion
+        private void ReportExcel()
+        {
+
+        }
+        private void ReportPDF()
+        {
+
+        }
+
+        
     }
 }

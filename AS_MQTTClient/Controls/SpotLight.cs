@@ -35,7 +35,6 @@ namespace AS_MQTTClient.Controls
         {
             this.Loaded += SpotLight_Loaded;
         }
-
         private void SpotLight_Loaded(object sender, RoutedEventArgs e)
         {
             Canvas.SetLeft(_textBlockBottom, ActualWidth / 3);
@@ -59,7 +58,6 @@ namespace AS_MQTTClient.Controls
                 _textBlockTop.Loaded += _textBlockTop_Loaded;
         }
 
-
         private void _textBlockTop_Loaded(object sender, RoutedEventArgs e)
         {
             var doubleAnimation = new DoubleAnimation
@@ -67,7 +65,6 @@ namespace AS_MQTTClient.Controls
                 To = _textBlockTop.ActualWidth,
                 Duration = TimeSpan.FromSeconds(3)
             };
-
             Storyboard.SetTarget(doubleAnimation, _textBlockTop);
             Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("(UIElement.Clip).(EllipseGeometry.Transform).(TranslateTransform.X)"));
             var storyboard = new Storyboard

@@ -369,47 +369,31 @@
                            materialDesign:ColorZoneAssist.Mode="SecondaryLight"
                            materialDesign:HintAssist.Hint="DataBase"
                            materialDesign:HintAssist.HelperText="Select one DataBase"
-                        MinWidth="128" Height="56" Margin="10,0,0,0" Width="200" HorizontalAlignment="Left">
-                        <ComboBoxItem
-                                   Content="AS_MQTTClient" />
-                        <ComboBoxItem
-                                   Content="SCADA" />
-                        <ComboBoxItem
-                                    Content="BlazorWASMAPP" />
-                        <ComboBoxItem
-                                  Content="QuanLiKho" />
+                        MinWidth="128" Height="56" Margin="10,0,0,0" Width="200" HorizontalAlignment="Left" SelectionChanged="cbDatabase_SelectionChanged"
+                          >
+                        
                     </ComboBox>
                     <ComboBox x:Name="cbDataTable"
                              materialDesign:HintAssist.Hint="Table" Margin="10,20,0,0" Height="35" Width="200" HorizontalAlignment="Left">
-                        <ComboBoxItem
-                                Content="Modbus_Slave1" />
-                        <ComboBoxItem
-                                Content="Modbus_Slave2" />
-                        <ComboBoxItem
-                                Content="Modbus_Slave3" />
-                        <ComboBoxItem
-                                   Content="Modbus_Slave4" />
+                        
                     </ComboBox>
                 </StackPanel>
                 <!--Load Database table-->
                 <StackPanel Grid.Column="1" Orientation="Vertical">
-                    <Button Content="Read SQL" x:Name="btnReadDB" Width="94" Height="45" Margin="0,10,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
-                    <Button Content="Load Table" x:Name="btnLoadTable" Width="94" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
-
+                    <Button Content="Read SQL" x:Name="btnReadDB" Width="94" Height="45" Margin="0,10,0,0" Click="btnReadSQL_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="Load Table" x:Name="btnLoadTable" Width="94" Height="45" Margin="0,15,0,0" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
                 </StackPanel>
-
-
                 <StackPanel Grid.Column="2" Orientation="Vertical">
-                    <DatePicker x:Name="Dp_FromDate"
+                    <DatePicker x:Name="DpFromDate"
                         Width="264"
                         materialDesign:HintAssist.Hint="From Date"
                         materialDesign:TextFieldAssist.HasClearButton="True"
                         Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Height="60" Background="Transparent" />
-                    <DatePicker x:Name="Dp_ToDate"
+                    <DatePicker x:Name="DpToDate"
                         Width="260"
                         materialDesign:HintAssist.Hint="To Date"
                         materialDesign:TextFieldAssist.HasClearButton="True"
-                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Height="52" />
+                        Style="{StaticResource MaterialDesignFloatingHintDatePicker}" Height="52" FirstDayOfWeek="Monday" />
 
                 </StackPanel>
                 <StackPanel Grid.Column="3" Orientation="Vertical" Margin="10,0,10,0">
@@ -426,17 +410,17 @@
                         <ComboBoxItem
                                    Content="A4" />
                     </ComboBox>
-                    <Button Content="ShowData" x:Name="btnShowData" Width="133" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="ShowData" x:Name="btnShowData" Width="133" Height="45" Margin="0,15,0,0" Click="btnShowData_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
 
                 </StackPanel>
                 <StackPanel Grid.Column="4" Orientation="Vertical" Margin="10,0,10,0">
-                    <Button Content="Excel" x:Name="btnExcel" Width="94" Height="45" Margin="0,10,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
-                    <Button Content="PDF" x:Name="btnPDF" Width="94" Height="45" Margin="0,15,0,0" Click="btnClear_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="Excel" x:Name="btnExcel" Width="94" Height="45" Margin="0,10,0,0" Click="btnExcel_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                    <Button Content="PDF" x:Name="btnPDF" Width="94" Height="45" Margin="0,15,0,0" Click="btnPDF_Click" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
 
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="1">
-                
+                <DataGrid x:Name="dgDataTest"/>
             </Grid>
         </Grid>
         <!--Connection-->
@@ -476,7 +460,7 @@
                                 <TextBlock Text="UserName:" Margin="30,0,0,0" Height="20" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
                                 <TextBox x:Name="txtUserName" Text="AnSinh" Background="{x:Null}" Height="24" Margin="4,0,0,0" Width="52" Foreground="Black" FontSize="14" />
                                 <TextBlock Text="PassWord:" Margin="30,0,0,0" Height="20" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
-                                <TextBox x:Name="txtPassWord" Text="ansinh123" Width="102" Height="24" Background="{x:Null}" Margin="4,0,0,0" FontSize="14"  />
+                                <PasswordBox x:Name="txtPassWord" Password="ansinh123" Width="102" Height="24" Background="{x:Null}" Margin="4,0,0,0" FontSize="14"  />
                                 <Button x:Name="btnConnect" Content="Connect" Click="btnConnect_Click" Margin="120,-0.7,30,0" Height="47" Background="#FF88F0FB" BorderBrush="#FFC8C8C8" FontWeight="Bold" Foreground="Black" Width="96" FontSize="20" />
                                 <Button x:Name="btnDisconnect" Content="Disconnect" Click="btnDisconnect_Click" Height="47" Background="#FF88F0FB" FontWeight="Bold" Foreground="Black" Width="125" FontSize="20" Margin="10,2,2,2" />
 

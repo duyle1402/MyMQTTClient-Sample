@@ -10,20 +10,12 @@ using System.Windows.Input;
 
 namespace AS_MQTTClient.Controls
 {
-    // list
-
     public class HMISwitch : ButtonBase
     {
         static HMISwitch()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(HMISwitch), new FrameworkPropertyMetadata(typeof(HMISwitch)));
-        }
-
-
-        //
-        
-             
-    
+        } 
         protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonUp(e);
@@ -34,7 +26,6 @@ namespace AS_MQTTClient.Controls
             }
             e.Handled = false;
         }
-
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
@@ -44,7 +35,6 @@ namespace AS_MQTTClient.Controls
                     _funcWrites.ForEach(x => x(true));
             }
         }
-
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
@@ -67,21 +57,16 @@ namespace AS_MQTTClient.Controls
                     foreach (var item in _funcints)
                     {
                         _funcints.ForEach(x => x());
-                    }
-                  
+                    }                  
                 }
             }
         }
-
         protected override void OnCheckedChanged(bool? oldstat, bool? newstat)
         {
             if (newstat.HasValue)
             {
                 VisualStateManager.GoToState(this, newstat.Value == true ? "ON" : "OFF", true);
-            }
-           
-        }
-
-     
+            }           
+        }     
     }
 }

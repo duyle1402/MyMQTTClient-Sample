@@ -10,6 +10,7 @@ using LiveCharts;
 using LiveCharts.Configurations;
 using AS_MQTTClient.Model;
 using System.Threading;
+using System.Collections.ObjectModel;
 
 namespace AS_MQTTClient.ViewModel
 {
@@ -17,7 +18,6 @@ namespace AS_MQTTClient.ViewModel
     {
         public bool Isloaded = false;
         public ICommand LoadedWindowCommand { get; set; }
-
 
         #region real time data live chart
         private double _axisMax;
@@ -92,6 +92,8 @@ namespace AS_MQTTClient.ViewModel
             }
               );
 
+
+          
         
         }
 
