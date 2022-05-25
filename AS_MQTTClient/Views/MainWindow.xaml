@@ -13,7 +13,7 @@
         mc:Ignorable="d"
         DataContext="{StaticResource MainVM}"
         
-        Title="Test Tool for GateWay IoT developed by DL " Height="730" Width="1055" Loaded="Window_Loaded">
+        Title="Client for GateWay IoT developed by DL " Height="730" Width="1055" Loaded="Window_Loaded">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedWindowCommand}" 
@@ -201,8 +201,8 @@
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Height="54" Width="238">
                 <!--<Border CornerRadius="30" Width="30" Height="30" Background="#59E6B5"/>
                 <Border CornerRadius="30" Width="30" Height="30" Background="#FF7900" Margin="-5 0 0 0"/>-->
-                <Image Source="pack://application:,,,/ImageResources/as logo.png"/>
-                <TextBlock Text="AS MQTT Test Tool" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Foreground="#4F5050" Margin="0,-0.3,0,0" Width="161"/>
+                <Image Source="pack://application:,,,/ImageResources/MQTT-icon.png"/>
+                <TextBlock Text="MQTT Client" FontWeight="Bold" FontSize="18" VerticalAlignment="Center" Foreground="#4F5050" Margin="16,-0.3,0,0" Width="161"/>
             </StackPanel>
 
             <UniformGrid Columns="5" Grid.Column="1">
@@ -245,7 +245,7 @@
 
         </Grid>
         <!--Welcome-->
-        <Grid Background="#59E6B5" Grid.ColumnSpan="3" x:Name="Grid_Welcome" Margin="0,5,0,0" Grid.Row="1" Visibility="Hidden"  >
+        <Grid Background="#59E6B5" Grid.ColumnSpan="3" x:Name="Grid_Welcome" Margin="0,5,0,0" Grid.Row="1" Visibility="Visible"  >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*"/>
                 <ColumnDefinition Width="111*"/>
@@ -258,26 +258,7 @@
                 <local:SpotLight Text="Welcome To" Height="60" Background="{x:Null}" Margin="-88,48,0,0" Width="514" HorizontalAlignment="Left" FontSize="50"/>
                 <local:SpotLight Text="IoT GateWay" Height="105" Background="{x:Null}" FontSize="60" Width="547" Margin="-200,0,0,0"/>
                 <TextBlock Height="90" FontSize="22" Width="643" HorizontalAlignment="Center" TextAlignment="Center" Foreground="White" FontWeight="Bold" FontFamily="Rockwell"><Run Text="This tool is developed to show the application"/><LineBreak/><Run Text=" of our IoT GateWay"/></TextBlock>
-                <StackPanel Orientation="Horizontal" Height="291" Width="495">
-                    <StackPanel Width="75" Margin="10,30,0,0" Height="231">
-                        <Image Source="pack://application:,,,/ImageResources/icons8-facebook-24 (1).png" Height="40" Width="59"/>
-                        <Image Source="pack://application:,,,/ImageResources/icons8-www-64.png" Height="35" Width="60" Margin="0,10,0,0"/>
-                        <Image Source="pack://application:,,,/ImageResources/icons8-phone-50.png" Height="35" Width="65" Margin="0,10,0,0"/>
-
-                        <Image Source="pack://application:,,,/ImageResources/icons8-mail-50.png" Height="40" Width="65" Margin="0,10,0,0"/>
-                        <Image Source="pack://application:,,,/ImageResources/icons8-navigation-48.png" Height="40" Width="55" Margin="0,10,0,0"/>
-
-                    </StackPanel>
-                    <StackPanel Width="395" Height="239" Margin="0,30,0,0">
-                        <TextBlock Text="An Sinh Electrical- Automation Company" FontSize="18" Margin="0,7,0,0" FontWeight="Bold" FontStyle="Italic" Height="24"/>
-                        <TextBlock Text="https://iot-industrial.com.vn/" FontSize="18" Margin="0,25,0,0" FontStyle="Italic" FontWeight="Bold"/>
-                        <TextBlock Text="098 535 63 90" FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic"/>
-                        <TextBlock Text="ansinh.ansinhautomation@gmail.com" FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic"/>
-                        <TextBlock FontSize="18" Margin="0,20,0,0" FontWeight="Bold" FontStyle="Italic" Height="57" RenderTransformOrigin="0.494,0.543"><Run Text=" 9- GS 13 Di An, Binh Duong Province, "/><LineBreak/><Run Text="Vietnam 75355"/></TextBlock>
-
-
-                    </StackPanel>
-                </StackPanel>
+               
             </StackPanel>
             <Grid Grid.Column="1" Margin="0,10,0,0" Grid.RowSpan="2">
                 <Image Source="pack://application:,,,/ImageResources/cf8a2b48c4600f3e5671-removebg-preview.png"/>
@@ -286,7 +267,7 @@
 
         <!--GateWay-->
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_GateWay" Margin="0,5,0,6" Visibility="Visible" Background="#FF8CF1AE">
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_GateWay" Margin="0,5,0,6" Visibility="Hidden" Background="#FF8CF1AE">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="108*"/>
                 <ColumnDefinition Width="103*"/>
@@ -304,7 +285,7 @@
                         <TextBlock Height="76" Width="519" FontStyle="Italic" FontWeight="Bold" Foreground="Black" Margin="0,7,0,0"><Run Text="Gateway IOT with 4 input digital, 4 output relay output, 2 channels Analog input 4-20 mA, 2"/><LineBreak/><Run Text="channels Analog 0-10v operating source 24VDC. Integrated RS485 communication, Modbus"/><LineBreak/><Run Text=" TCP, Remote monitoring via MQTT Client. Designed and tested by industry standards, "/><LineBreak/><Run Text="configuration and operation are simple via web server."/></TextBlock>
                     </StackPanel>
                 </Border>
-
+                
                 <Border Grid.Row="2" BorderThickness="2,2,2,2" BorderBrush="#FF0A3E84" CornerRadius="10,10,10,10" Margin="10,1,0,10">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -343,9 +324,9 @@
             </Grid>
         </Grid>
 
-        <!--AboutUs-->
+        <!--Report-->
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_AboutUs" Margin="0,5,0,0" Visibility="Visible" Background="White">
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_AboutUs" Margin="0,5,0,0" Visibility="Hidden" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="146*"/>
                 <RowDefinition Height="501*"/>

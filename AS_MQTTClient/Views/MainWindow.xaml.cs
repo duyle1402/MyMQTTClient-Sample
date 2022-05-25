@@ -25,7 +25,7 @@ using AS_MQTTClient.Model;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Windows.Controls;
-using Microsoft.Office.Interop.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
 
 
 namespace AS_MQTTClient.Views
@@ -33,15 +33,17 @@ namespace AS_MQTTClient.Views
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : System.Windows.Window, INotifyPropertyChanged
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         //ModelImporter import = new ModelImporter();
-
 
         MainViewModel mainVM = new MainViewModel();
         
        DispatcherTimer TimerArchive_analog = new DispatcherTimer();
        DispatcherTimer TimerArchive_modbus = new DispatcherTimer();
+       string modbusTable = "Data_modbus_test";
+       string analogTable = "Data_Analog_test";
+       DataTable tableData = new DataTable();
 
         public MainWindow()
         {
@@ -675,7 +677,7 @@ namespace AS_MQTTClient.Views
              }
 
         }
-
+        
         private void cbDatabase_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             cbDataTable.Items.Clear();
@@ -712,9 +714,8 @@ namespace AS_MQTTClient.Views
             var db = DataProvider.Ins.DB;
             dgDataTest.ItemsSource = null;
             string data = cbDataTable.SelectedItem as string;
-            string modbus = "Data_modbus_test";
-            string analog = "Data_Analog_test";
-            if (data == analog)
+            tableData.Clear();
+            if (data == analogTable)
             {
                 try
                 {
@@ -728,6 +729,9 @@ namespace AS_MQTTClient.Views
                         select new { s.Ngay, s.Raw_value, s.Process_value };
                         //dgDataTest.Items.Add(query.ToList());
                         dgDataTest.ItemsSource = query.ToList();
+                        
+                      //  tableData = ((DataView)dgDataTest.ItemsSource).ToTable();
+
                     }             
                     else
                     {
@@ -742,7 +746,7 @@ namespace AS_MQTTClient.Views
                 }
                               
             }
-            if (data == modbus)
+            if (data == modbusTable)
             {
                 try
                 {
@@ -753,9 +757,10 @@ namespace AS_MQTTClient.Views
                         var query =
                         from s in db.Data_modbus_test
                         where s.Ngay >= DpFromDate.SelectedDate && s.Ngay <= DpToDate.SelectedDate
-                        select new { s.Ngay, s.EnergyTotal, s.Q_sum };
+                        select new { s.Ngay, s.EnergyTotal, s.Q_sum };                       
                         //dgDataTest.Items.Add(query.ToList());
                         dgDataTest.ItemsSource = query.ToList();
+                        
                     }
                     
                     else
@@ -774,23 +779,96 @@ namespace AS_MQTTClient.Views
         }
         private void btnExcel_Click(object sender, RoutedEventArgs e)
         {
-            ReportExcel();
+            tableData = ((DataView)dgDataTest.ItemsSource).ToTable();
+            ReportExcel(tableData, "Report", "test");
         }
 
         private void btnPDF_Click(object sender, RoutedEventArgs e)
         {
-            ReportPDF();
+            
         }
         #endregion
-        private void ReportExcel()
+        private void ReportExcel(DataTable dataTable, string header, string day)
+        {
+          
+            Excel._Application ExcelApp = new Excel.Application();
+            Excel._Workbook workbook = ExcelApp.Workbooks.Add(Type.Missing);
+            Excel._Worksheet worksheet = null;
+            ExcelApp.Visible = true;
+            worksheet = workbook.Sheets["ReportFromMQTTClient"];
+            worksheet = workbook.ActiveSheet;
+
+            // phần header
+            Excel.Range Header1 = (Excel.Range)worksheet.Cells[1, 1];
+            Excel.Range Header2 = (Excel.Range)worksheet.Cells[1, dataTable.Columns.Count];
+            Excel.Range Header = worksheet.get_Range(Header1, Header2);
+            Header.MergeCells = true;
+            Header.Value2 = header;
+            Header.Font.Bold = true;
+            Header.Font.Name = "Times New Roman";
+            Header.Font.Size = "18";
+            Header.Font.ColorIndex = 30;
+            Header.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+            // phần time
+            Excel.Range PhanTime1 = (Excel.Range)worksheet.Cells[2, 1];
+            Excel.Range PhanTime2 = (Excel.Range)worksheet.Cells[2, dataTable.Columns.Count]; //nếu có cột tổng: + 1
+            Excel.Range PhanTime = worksheet.get_Range(PhanTime1, PhanTime2);
+            PhanTime.MergeCells = true;
+            PhanTime.Value2 = day; // "Từ " + dateTimePicker01.Value.ToString("dd/MM/yyyy HH:mm:ss") + " đến " + dateTimePicker02.Value.ToString("dd/MM/yyyy HH:mm:ss");
+            PhanTime.Font.Bold = false;
+            PhanTime.Font.Name = "Times New Roman";
+            PhanTime.Font.Size = "12";
+            PhanTime.Font.ColorIndex = 26;
+            PhanTime.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+            // phần data
+            Excel.Range PhanData1 = (Excel.Range)worksheet.Cells[3, 1];
+            Excel.Range PhanData2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
+            Excel.Range PhanData = worksheet.get_Range(PhanData1, PhanData2);
+            PhanData.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            PhanData.Font.Bold = false;
+            PhanData.Font.Name = "Times New Roman";
+            PhanData.Font.Size = "12";
+
+            Excel.Range Vung1 = (Excel.Range)worksheet.Cells[1, 1];
+            Excel.Range Vung2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
+            Excel.Range Vung = worksheet.get_Range(Vung1, Vung2);
+            Vung.Borders.LineStyle = Excel.Constants.xlSolid;
+
+            //data
+            for (int i = 0; i < dataTable.Columns.Count; i++)
+            {
+                worksheet.Cells[3, i + 1] = dataTable.Columns[i].ColumnName;
+            }
+            //worksheet.Cells[3, dataGridView.Columns.Count + 1] = "TỔNG";
+
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                {
+                    if (dataTable.Rows[i][j] != null)
+                    {
+                        worksheet.Cells[i + 4, j + 1] = dataTable.Rows[i][j].ToString();
+                    }
+                    else
+                    {
+                        worksheet.Cells[i + 4, j] = "";
+                    }
+                }
+            }
+
+
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(ExcelApp);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
+
+        }
+        private void ReportPDF(DataTable dataTable, string SizePage, string header, string day )
         {
 
         }
-        private void ReportPDF()
-        {
-
-        }
-
         
+       
     }
 }
