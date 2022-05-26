@@ -245,7 +245,7 @@
 
         </Grid>
         <!--Welcome-->
-        <Grid Background="#59E6B5" Grid.ColumnSpan="3" x:Name="Grid_Welcome" Margin="0,5,0,0" Grid.Row="1" Visibility="Visible"  >
+        <Grid Background="#59E6B5" Grid.ColumnSpan="3" x:Name="Grid_Welcome" Margin="0,5,0,0" Grid.Row="1" Visibility="Hidden"  >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="100*"/>
                 <ColumnDefinition Width="111*"/>
@@ -326,7 +326,7 @@
 
         <!--Report-->
 
-        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_AboutUs" Margin="0,5,0,0" Visibility="Hidden" Background="White">
+        <Grid Grid.Row="1" Grid.ColumnSpan="3" x:Name="grid_AboutUs" Margin="0,5,0,0" Visibility="Visible" Background="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="146*"/>
                 <RowDefinition Height="501*"/>

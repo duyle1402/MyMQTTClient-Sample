@@ -26,7 +26,13 @@ using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Windows.Controls;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Windows.Input;
+using iTextSharp;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
 
+using System.IO;
+using Microsoft.Win32;
 
 namespace AS_MQTTClient.Views
 {
@@ -48,13 +54,7 @@ namespace AS_MQTTClient.Views
         public MainWindow()
         {
             InitializeComponent();
-
-            // import 3D model
-            //ObjReader myHelixObjReader = new ObjReader();
-            //Model3DGroup MyModel = import.Load(@".\model\magnolia.stl");        
-            //model.Content = MyModel;
-            //helixControl.ZoomExtents();
-
+           
             //--------------------------------  REAL TIME DATA------------------------------
             //To handle live data easily, in this case we built a specialized type
             //the MeasureModel class, it only contains 2 properties
@@ -174,7 +174,7 @@ namespace AS_MQTTClient.Views
 
         private void MqttClient_OnNetworkError(object sender, EventArgs e)
         {
-            // Triggered when the network is abnormal, you can reconnect to the server here
+            // Triggered when the network is abnormal,  can reconnect to the server here
             if (sender is MqttClient client)
             {
                 // Start to reconnect to the server until the connection is successful
@@ -185,11 +185,11 @@ namespace AS_MQTTClient.Views
                     System.Threading.Thread.Sleep(10_000);
                     client.LogNet?.WriteInfo("Ready to reconnect to the server...");
 
-                    // Before reconnecting, you need to determine whether the Client is closed, and the exceptions that you rewrite need to be handled manually by yourself
+                    // Before reconnecting,need to determine whether the Client is closed, and the exceptions that you rewrite need to be handled manually by yourself
                     OperateResult connect = client.ConnectServer();
                     if (connect.IsSuccess)
                     {
-                        // After the connection is successful, you can subscribe before the break below, or initialize the data
+                        // After the connection is successful, subscribe before the break below, or initialize the data
                         client.LogNet?.WriteInfo("Successfully connected to the server!");
                         break;
                     }
@@ -779,23 +779,24 @@ namespace AS_MQTTClient.Views
         }
         private void btnExcel_Click(object sender, RoutedEventArgs e)
         {
-            tableData = ((DataView)dgDataTest.ItemsSource).ToTable();
+            tableData = DataGridtoDataTable(dgDataTest);
             ReportExcel(tableData, "Report", "test");
         }
 
         private void btnPDF_Click(object sender, RoutedEventArgs e)
         {
-            
+            tableData = DataGridtoDataTable(dgDataTest);
+            ReportPDF(tableData, "A4", "Report", "test");
         }
         #endregion
         private void ReportExcel(DataTable dataTable, string header, string day)
         {
-          
-            Excel._Application ExcelApp = new Excel.Application();
-            Excel._Workbook workbook = ExcelApp.Workbooks.Add(Type.Missing);
-            Excel._Worksheet worksheet = null;
-            ExcelApp.Visible = true;
-            worksheet = workbook.Sheets["ReportFromMQTTClient"];
+
+            Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
+            Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
+            Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
+            app.Visible = true;
+            worksheet = workbook.Sheets["Sheet1"];
             worksheet = workbook.ActiveSheet;
 
             // phần header
@@ -811,30 +812,30 @@ namespace AS_MQTTClient.Views
             Header.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
             // phần time
-            Excel.Range PhanTime1 = (Excel.Range)worksheet.Cells[2, 1];
-            Excel.Range PhanTime2 = (Excel.Range)worksheet.Cells[2, dataTable.Columns.Count]; //nếu có cột tổng: + 1
-            Excel.Range PhanTime = worksheet.get_Range(PhanTime1, PhanTime2);
-            PhanTime.MergeCells = true;
-            PhanTime.Value2 = day; // "Từ " + dateTimePicker01.Value.ToString("dd/MM/yyyy HH:mm:ss") + " đến " + dateTimePicker02.Value.ToString("dd/MM/yyyy HH:mm:ss");
-            PhanTime.Font.Bold = false;
-            PhanTime.Font.Name = "Times New Roman";
-            PhanTime.Font.Size = "12";
-            PhanTime.Font.ColorIndex = 26;
-            PhanTime.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            Excel.Range PartTime1 = (Excel.Range)worksheet.Cells[2, 1];
+            Excel.Range PartTime2 = (Excel.Range)worksheet.Cells[2, dataTable.Columns.Count]; //nếu có cột tổng: + 1
+            Excel.Range PartTime = worksheet.get_Range(PartTime1, PartTime2);
+            PartTime.MergeCells = true;
+            PartTime.Value2 = day; // "Từ " + dateTimePicker01.Value.ToString("dd/MM/yyyy HH:mm:ss") + " đến " + dateTimePicker02.Value.ToString("dd/MM/yyyy HH:mm:ss");
+            PartTime.Font.Bold = false;
+            PartTime.Font.Name = "Times New Roman";
+            PartTime.Font.Size = "12";
+            PartTime.Font.ColorIndex = 26;
+            PartTime.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
             // phần data
-            Excel.Range PhanData1 = (Excel.Range)worksheet.Cells[3, 1];
-            Excel.Range PhanData2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
-            Excel.Range PhanData = worksheet.get_Range(PhanData1, PhanData2);
-            PhanData.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-            PhanData.Font.Bold = false;
-            PhanData.Font.Name = "Times New Roman";
-            PhanData.Font.Size = "12";
+            Excel.Range PartData1 = (Excel.Range)worksheet.Cells[3, 1];
+            Excel.Range PartnData2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
+            Excel.Range PartData = worksheet.get_Range(PartData1, PartnData2);
+            PartData.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            PartData.Font.Bold = false;
+            PartData.Font.Name = "Times New Roman";
+            PartData.Font.Size = "12";
 
-            Excel.Range Vung1 = (Excel.Range)worksheet.Cells[1, 1];
-            Excel.Range Vung2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
-            Excel.Range Vung = worksheet.get_Range(Vung1, Vung2);
-            Vung.Borders.LineStyle = Excel.Constants.xlSolid;
+            Excel.Range Area1 = (Excel.Range)worksheet.Cells[1, 1];
+            Excel.Range Area2 = (Excel.Range)worksheet.Cells[dataTable.Rows.Count + 3, dataTable.Columns.Count];
+            Excel.Range Area = worksheet.get_Range(Area1, Area2);
+            Area.Borders.LineStyle = Excel.Constants.xlSolid;
 
             //data
             for (int i = 0; i < dataTable.Columns.Count; i++)
@@ -860,15 +861,112 @@ namespace AS_MQTTClient.Views
 
 
             System.Runtime.InteropServices.Marshal.ReleaseComObject(workbook);
-            System.Runtime.InteropServices.Marshal.ReleaseComObject(ExcelApp);
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(app);
             System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
 
         }
         private void ReportPDF(DataTable dataTable, string SizePage, string header, string day )
         {
+            iTextSharp.text.Font Times = FontFactory.GetFont("Times");
+            // Creating iTextSharp Table from DataTable data
+            PdfPTable pdfTable = new PdfPTable(dataTable.Columns.Count);
+            pdfTable.DefaultCell.Padding = 10;
+            pdfTable.WidthPercentage = 100;
+            pdfTable.HorizontalAlignment = Element.ALIGN_CENTER;
+            pdfTable.DefaultCell.BorderWidth = 1;
+
+            PdfPCell cellName = new PdfPCell(new Phrase(header, Times));
+            cellName.BackgroundColor = new iTextSharp.text.BaseColor(128, 255, 255);
+            cellName.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            cellName.Colspan = dataTable.Columns.Count;
+            pdfTable.AddCell(cellName);
+
+            PdfPCell cellDay = new PdfPCell(new Phrase(day, Times));
+            cellDay.BackgroundColor = new iTextSharp.text.BaseColor(255, 255, 128);
+            cellDay.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+            cellDay.Colspan = dataTable.Columns.Count;
+            pdfTable.AddCell(cellDay);
+
+            for (int i = 0; i < dataTable.Columns.Count; i++)
+            {
+                PdfPCell cellHeader = new PdfPCell(new Phrase(dataTable.Columns[i].ColumnName, Times));
+                cellHeader.BackgroundColor = new iTextSharp.text.BaseColor(240, 240, 240);
+                cellHeader.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+                pdfTable.AddCell(cellHeader);
+            }
+
+            // Add data
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                for (int j = 0; j < dataTable.Columns.Count; j++)
+                {
+                    if (dataTable.Rows[i][j] != null)
+                    {
+                        PdfPCell cellData = new PdfPCell(new Phrase(dataTable.Rows[i][j].ToString(), Times));
+                        cellData.BackgroundColor = new iTextSharp.text.BaseColor(255, 255, 255);
+                        cellData.HorizontalAlignment = 1; //0=Left, 1=Centre, 2=Right
+                        pdfTable.AddCell(cellData);
+                    }
+                }
+            }
+            // Exporting to PDF
+            SaveFileDialog path = new SaveFileDialog();
+            path.Title = "Export Setting";
+            path.Filter = "Text file (pdf)|*.pdf|All file (*.*)|*.*";
+
+            iTextSharp.text.Rectangle Size = PageSize.A4;
+            if (SizePage == "A0") { Size = PageSize.A0; }
+            if (SizePage == "A1") { Size = PageSize.A1; }
+            if (SizePage == "A2") { Size = PageSize.A2; }
+            if (SizePage == "A3") { Size = PageSize.A3; }
+            if (SizePage == "A4") { Size = PageSize.A4; }
+            if (SizePage == "A5") { Size = PageSize.A5; }
+
+            if (path.ShowDialog() == true)
+            {
+                using (FileStream stream = new FileStream(path.FileName, FileMode.Create))
+                {
+                    Document pdfDoc = new Document(Size, 10f, 10f, 10f, 10f);
+                    PdfWriter.GetInstance(pdfDoc, stream);
+                    pdfDoc.Open();
+                    pdfDoc.Add(pdfTable);
+                    pdfDoc.Close();
+                }
+            }
+        }
+        // datagrid to datatable
+        public static DataTable DataGridtoDataTable(DataGrid dg)
+        {
+
+
+            dg.SelectAllCells();
+            dg.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
+            ApplicationCommands.Copy.Execute(null, dg);
+            dg.UnselectAllCells();
+            String result = (string)Clipboard.GetData(DataFormats.CommaSeparatedValue);
+            string[] Lines = result.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            string[] Fields;
+            Fields = Lines[0].Split(new char[] { ',' });
+            int Cols = Fields.GetLength(0);
+            DataTable dt = new DataTable();
+            //1st row must be column names; force lower case to ensure matching later on.
+            for (int i = 0; i < Cols; i++)
+                dt.Columns.Add(Fields[i].ToUpper(), typeof(string));
+            DataRow Row;
+            for (int i = 1; i < Lines.GetLength(0) - 1; i++)
+            {
+                Fields = Lines[i].Split(new char[] { ',' });
+                Row = dt.NewRow();
+                for (int f = 0; f < Cols; f++)
+                {
+                    Row[f] = Fields[f];
+                }
+                dt.Rows.Add(Row);
+            }
+            return dt;
 
         }
-        
-       
+
+
     }
 }
