@@ -362,7 +362,7 @@
                 <!--Load Database table-->
                 <StackPanel Grid.Column="1" Orientation="Vertical">
                     <Button Content="Read SQL" x:Name="btnReadDB" Width="94" Height="45" Margin="0,10,0,0" Click="btnReadSQL_Click" BorderBrush="White" Background="#FFC6F8FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
-                    <Button Content="Load Table" x:Name="btnLoadTable" Width="94" Height="45" Margin="0,15,0,0" BorderBrush="White" Background="#FFBFF7FD" BorderThickness="2,2,2,2" Foreground="Black" FontSize="14"/>
+                   
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Vertical">
                     <DatePicker x:Name="DpFromDate"
@@ -378,7 +378,7 @@
 
                 </StackPanel>
                 <StackPanel Grid.Column="3" Orientation="Vertical" Margin="10,0,10,0">
-                    <ComboBox
+                    <ComboBox x:Name="cbSizePage"
                              materialDesign:HintAssist.Hint="Type Page" Margin="10,20,0,0" Height="35" Width="200" HorizontalAlignment="Left">
                         <ComboBoxItem
                                 Content="A0" />

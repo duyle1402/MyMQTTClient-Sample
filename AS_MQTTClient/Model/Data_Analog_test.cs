@@ -14,9 +14,9 @@ namespace AS_MQTTClient.Model
     
     public partial class Data_Analog_test
     {
-        public System.Guid Id { get; set; }
+        public int myID { get; set; }
         public Nullable<System.DateTime> Ngay { get; set; }
-        public Nullable<double> Raw_value { get; set; }
-        public Nullable<double> Process_value { get; set; }
+        public Nullable<double> RawValue { get; set; }
+        public Nullable<double> ProcessValue { get; set; }
     }
 }

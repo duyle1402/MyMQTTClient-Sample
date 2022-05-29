@@ -21,11 +21,11 @@ namespace AS_MQTTClient.Model
         }
 
 
-        public AS_MQTTClientEntities1 DB { get; set; }
+        public AS_MQTTClientEntities DB { get; set; }
 
         private DataProvider()
         {
-            DB = new AS_MQTTClientEntities1();
+            DB = new AS_MQTTClientEntities();
         }
 
     }

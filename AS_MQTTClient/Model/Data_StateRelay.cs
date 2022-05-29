@@ -12,15 +12,10 @@ namespace AS_MQTTClient.Model
     using System;
     using System.Collections.Generic;
     
-    public partial class Data_Modbus_test
+    public partial class Data_StateRelay
     {
         public int myID { get; set; }
         public Nullable<System.DateTime> Ngay { get; set; }
-        public Nullable<double> EnergyTotal { get; set; }
-        public Nullable<double> QSum { get; set; }
-        public Nullable<double> Iavg { get; set; }
-        public Nullable<double> PSum { get; set; }
-        public Nullable<double> Hz { get; set; }
-        public Nullable<double> Vavg { get; set; }
+        public Nullable<bool> State { get; set; }
     }
 }

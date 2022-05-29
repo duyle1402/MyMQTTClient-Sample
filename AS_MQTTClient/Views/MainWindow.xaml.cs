@@ -30,7 +30,6 @@ using System.Windows.Input;
 using iTextSharp;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-
 using System.IO;
 using Microsoft.Win32;
 
@@ -43,13 +42,15 @@ namespace AS_MQTTClient.Views
     {
         //ModelImporter import = new ModelImporter();
 
-        MainViewModel mainVM = new MainViewModel();
+       MainViewModel mainVM = new MainViewModel();
         
        DispatcherTimer TimerArchive_analog = new DispatcherTimer();
        DispatcherTimer TimerArchive_modbus = new DispatcherTimer();
-       string modbusTable = "Data_modbus_test";
+       string modbusTable = "Data_Modbus_test";
        string analogTable = "Data_Analog_test";
+       string sqlconnectstring = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AS_MQTTClient;Integrated Security=True";
        DataTable tableData = new DataTable();
+
 
         public MainWindow()
         {
@@ -122,6 +123,8 @@ namespace AS_MQTTClient.Views
         }
         private MqttClient mqttClient;
 
+
+        #region connection and display
         private async void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             //  connect, use encrytion bằng fasle dể test trc
@@ -433,9 +436,9 @@ namespace AS_MQTTClient.Views
                 }
             }
         }
+        #endregion
 
 
-        
         // lưu trữ data, đặt tên phải giống cấu trúc chuỗi json nếu k bị lỗi 
         // save the data, class name must be equal json.name
         public class Relay
@@ -462,10 +465,10 @@ namespace AS_MQTTClient.Views
                 var data_analog = db.Data_Analog_test;
                 data_analog.Add(new Data_Analog_test
                 {
-                    Id = Guid.NewGuid(),
+                    
                     Ngay = DateTime.Now,
-                    Raw_value = rawvalue,
-                    Process_value = (float)processvalue
+                    RawValue = rawvalue,
+                    ProcessValue = (float)processvalue
 
                 });
                 db.SaveChanges();
@@ -476,10 +479,10 @@ namespace AS_MQTTClient.Views
         {
             using (var db = DataProvider.Ins.DB)
             {
-                var data_modbus = db.Data_modbus_test;
-                data_modbus.Add(new Data_modbus_test
+                var data_modbus = db.Data_Modbus_test;
+                data_modbus.Add(new Data_Modbus_test
                 {
-                    Id = Guid.NewGuid(),
+                   
                     Ngay = DateTime.Now,
                     EnergyTotal = modbus,
                 });
@@ -635,6 +638,8 @@ namespace AS_MQTTClient.Views
 
 
         // load data live chart
+       
+        
         private void btnLoad_Click(object sender, RoutedEventArgs e)
         {
             //IsReading = !IsReading;
@@ -642,20 +647,9 @@ namespace AS_MQTTClient.Views
 
                 Task.Factory.StartNew(mainVM.Read);
         }
-        #region INotifyPropertyChanged implementation
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged(string propertyName = null)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion
-       
+                    
         #region show data sql
-        string sqlconnectstring = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=AS_MQTTClient;Integrated Security=True";
+        
         private void btnReadSQL_Click(object sender, RoutedEventArgs e)
         {
             cbDatabase.Items.Clear();
@@ -683,6 +677,7 @@ namespace AS_MQTTClient.Views
             cbDataTable.Items.Clear();
             var table = cbDatabase.SelectedItem as string;
             string catalog = "AS_MQTTClient";
+           
             if (table == catalog)
             {
                 using (var sqlConnection = new SqlConnection(sqlconnectstring))
@@ -722,30 +717,28 @@ namespace AS_MQTTClient.Views
 
                     if (DpFromDate.SelectedDate < DpToDate.SelectedDate && DpFromDate.SelectedDate != null && DpToDate.SelectedDate != null)
                     {
-                        
+
                         var query =
                         from s in db.Data_Analog_test
                         where s.Ngay >= DpFromDate.SelectedDate && s.Ngay <= DpToDate.SelectedDate
-                        select new { s.Ngay, s.Raw_value, s.Process_value };
+                        select s;
                         //dgDataTest.Items.Add(query.ToList());
                         dgDataTest.ItemsSource = query.ToList();
-                        
-                      //  tableData = ((DataView)dgDataTest.ItemsSource).ToTable();
-
-                    }             
+                      
+                    }
                     else
                     {
                         MessageBox.Show("Chọn lại ngày, ngày bắt đầu xem phải trước ngày kết thúc", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-
 
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-                              
+
             }
+         
             if (data == modbusTable)
             {
                 try
@@ -753,41 +746,42 @@ namespace AS_MQTTClient.Views
 
                     if (DpFromDate.SelectedDate < DpToDate.SelectedDate && DpFromDate.SelectedDate != null && DpToDate.SelectedDate != null)
                     {
-                      
+
                         var query =
-                        from s in db.Data_modbus_test
+                        from s in db.Data_Modbus_test
                         where s.Ngay >= DpFromDate.SelectedDate && s.Ngay <= DpToDate.SelectedDate
-                        select new { s.Ngay, s.EnergyTotal, s.Q_sum };                       
+                        select s;
                         //dgDataTest.Items.Add(query.ToList());
                         dgDataTest.ItemsSource = query.ToList();
-                        
+
                     }
-                    
+
                     else
                     {
-                        MessageBox.Show("Chọn lại ngày, ngày bắt đầu xem phải trước ngày kết thúc" ,"Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Chọn lại ngày, ngày bắt đầu xem phải trước ngày kết thúc", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
-                    
+
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message);
                 }
-        
+
             }
-         
+
         }
         private void btnExcel_Click(object sender, RoutedEventArgs e)
         {
             tableData = DataGridtoDataTable(dgDataTest);
-            ReportExcel(tableData, "Report", "test");
+            ReportExcel(tableData, "Report from MQTT Client", "From: " + ConvertDatePicker(DpFromDate, "dd/MM/yyyy") + " To: " + ConvertDatePicker(DpToDate, "dd/MM/yyyy"));
         }
 
         private void btnPDF_Click(object sender, RoutedEventArgs e)
         {
             tableData = DataGridtoDataTable(dgDataTest);
-            ReportPDF(tableData, "A4", "Report", "test");
+            ReportPDF(tableData, cbSizePage.Text , "Report from MQTT Client", "From: " + ConvertDatePicker(DpFromDate, "dd/MM/yyyy") + " To: " + ConvertDatePicker(DpToDate, "dd/MM/yyyy"));
         }
+
         #endregion
         private void ReportExcel(DataTable dataTable, string header, string day)
         {
@@ -865,6 +859,7 @@ namespace AS_MQTTClient.Views
             System.Runtime.InteropServices.Marshal.ReleaseComObject(worksheet);
 
         }
+
         private void ReportPDF(DataTable dataTable, string SizePage, string header, string day )
         {
             iTextSharp.text.Font Times = FontFactory.GetFont("Times");
@@ -934,11 +929,24 @@ namespace AS_MQTTClient.Views
                 }
             }
         }
+       
+        #region 
+        // convert datepicker
+        public string ConvertDatePicker(DatePicker value, string Type)
+        {
+            DateTime? selectedDate = value.SelectedDate;
+
+            if (selectedDate.HasValue)
+            {
+                return selectedDate.Value.ToString(Type, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            return DateTime.Now.ToString(Type, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
         // datagrid to datatable
         public static DataTable DataGridtoDataTable(DataGrid dg)
         {
-
-
             dg.SelectAllCells();
             dg.ClipboardCopyMode = DataGridClipboardCopyMode.IncludeHeader;
             ApplicationCommands.Copy.Execute(null, dg);
@@ -967,6 +975,19 @@ namespace AS_MQTTClient.Views
 
         }
 
+        #endregion
+
+        #region INotifyPropertyChanged implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
 
     }
 }

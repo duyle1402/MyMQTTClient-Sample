@@ -13,10 +13,10 @@ namespace AS_MQTTClient.Model
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class AS_MQTTClientEntities1 : DbContext
+    public partial class AS_MQTTClientEntities : DbContext
     {
-        public AS_MQTTClientEntities1()
-            : base("name=AS_MQTTClientEntities1")
+        public AS_MQTTClientEntities()
+            : base("name=AS_MQTTClientEntities")
         {
         }
     
@@ -26,7 +26,8 @@ namespace AS_MQTTClient.Model
         }
     
         public virtual DbSet<Data_Analog_test> Data_Analog_test { get; set; }
-        public virtual DbSet<Data_modbus_test> Data_modbus_test { get; set; }
+        public virtual DbSet<Data_Modbus_test> Data_Modbus_test { get; set; }
+        public virtual DbSet<Data_StateRelay> Data_StateRelay { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
         public virtual DbSet<User> Users { get; set; }
     }
